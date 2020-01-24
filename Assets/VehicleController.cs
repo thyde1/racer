@@ -6,6 +6,7 @@ public class VehicleController : MonoBehaviour
     public GameObject FrontWheels;
     public GameObject BackWheels;
     public float Acceleration = 1;
+    public float MaxSpeed = 1;
     public float Drag = 1;
     public float Steering = 1;
     public float Grip = 1;
@@ -42,7 +43,7 @@ public class VehicleController : MonoBehaviour
             degradedVelocity = Vector3.zero;
         }
 
-        this.velocity = degradedVelocity + acceleratorValue * this.Acceleration * Time.deltaTime * this.transform.forward;
+        this.velocity = Vector3.ClampMagnitude(degradedVelocity + acceleratorValue * this.Acceleration * Time.deltaTime * this.transform.forward, this.MaxSpeed);
         this.transform.Rotate(this.transform.up, this.steeringValue * this.Steering);
         var rotationOverlaps = Physics.OverlapBox(this.transform.position, this.transform.lossyScale / 2, this.transform.rotation)
             .Where(collider => collider is BoxCollider && !collider.gameObject.transform.IsChildOf(this.transform));

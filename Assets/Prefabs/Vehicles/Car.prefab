@@ -202,7 +202,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   FrontWheels: {fileID: 6935152872594034460}
   BackWheels: {fileID: 5475021938573062193}
-  Acceleration: 5
+  Acceleration: 2
+  MaxSpeed: 1
   Drag: 1
   Steering: 2
   Grip: 5
