@@ -71,7 +71,6 @@ GameObject:
   - component: {fileID: 7410921239770148002}
   - component: {fileID: 3500571412205757589}
   - component: {fileID: 3322672272340396302}
-  - component: {fileID: 4997484490207213656}
   m_Layer: 0
   m_Name: Model
   m_TagString: Untagged
@@ -88,7 +87,7 @@ Transform:
   m_GameObject: {fileID: 7332117940507643671}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 2, y: 1, z: 4}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 3086794749332595974}
   - {fileID: 3836358351092365942}
@@ -141,19 +140,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!65 &4997484490207213656
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7332117940507643671}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &8800634866791416279
 GameObject:
   m_ObjectHideFlags: 0
@@ -164,8 +150,8 @@ GameObject:
   m_Component:
   - component: {fileID: 8800634866791416299}
   - component: {fileID: 8800634866791416278}
-  - component: {fileID: 1927979855199864765}
   - component: {fileID: 8566176768794282076}
+  - component: {fileID: 8771763689720280960}
   m_Layer: 0
   m_Name: Car
   m_TagString: Untagged
@@ -182,7 +168,7 @@ Transform:
   m_GameObject: {fileID: 8800634866791416279}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0.5, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2, y: 1, z: 4}
   m_Children:
   - {fileID: 8800634867925311039}
   - {fileID: 7410921239770148002}
@@ -196,28 +182,12 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8800634866791416279}
-  m_Material: {fileID: 13400000, guid: fceb555c717e85148944aee5f84ec014, type: 2}
+  m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!54 &1927979855199864765
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8800634866791416279}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 0.5
-  m_AngularDrag: 0
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
 --- !u!114 &8566176768794282076
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -232,9 +202,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   FrontWheels: {fileID: 6935152872594034460}
   BackWheels: {fileID: 5475021938573062193}
-  Acceleration: 20
-  Steering: 0.1
+  Acceleration: 5
+  Drag: 1
+  Steering: 2
   Grip: 5
+  NudgeAwayStrength: 0.1
+--- !u!54 &8771763689720280960
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8800634866791416279}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &8800634867925311034
 GameObject:
   m_ObjectHideFlags: 0
@@ -261,7 +249,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8800634867925311034}
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 10, z: 0}
+  m_LocalPosition: {x: 0, y: 30, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 8800634866791416299}
