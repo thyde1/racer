@@ -76,7 +76,7 @@ public class VehicleController : MonoBehaviour
 
     private void Bounce(Vector3 normal)
     {
-        if (normal.IsInvalid())
+        if (Vector3Utils.IsInvalid(normal))
         {
             return;
         }

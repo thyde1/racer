@@ -7,15 +7,17 @@ using System;
 public class CheckpointWatcher : MonoBehaviour
 {
     public GameObject[] Checkpoints;
-    private object nextCheckpoint;
+    private Dictionary<VehicleInfo, GameObject> nextCheckpoints;
+    public Dictionary<VehicleInfo, int> currentLaps { get; private set; }
     private IEnumerable<GameObject> vehicles;
 
     // Use this for initialization
     void Start()
     {
         this.HideCheckpoints();
-        this.nextCheckpoint = this.Checkpoints.First();
         this.vehicles = FindObjectsOfType<VehicleInfo>().Select(v => v.gameObject);
+        this.nextCheckpoints = this.vehicles.ToDictionary(v => v.GetComponent<VehicleInfo>(), v => this.Checkpoints.First());
+        this.currentLaps = this.vehicles.ToDictionary(v => v.GetComponent<VehicleInfo>(), v => 0);
         foreach (var c in this.Checkpoints)
         {
             var checkpoint = c.AddComponent<Checkpoint>();
@@ -26,7 +28,16 @@ public class CheckpointWatcher : MonoBehaviour
 
     internal void VehiclePassedCheckpoint(GameObject checkpoint, VehicleInfo vehicleInfo)
     {
-        Debug.Log($"Checkpoint {Array.IndexOf(this.Checkpoints, checkpoint) + 1}");
+        var checkpointIndex = Array.IndexOf(this.Checkpoints, checkpoint);
+        if (nextCheckpoints[vehicleInfo] == checkpoint)
+        {
+            nextCheckpoints[vehicleInfo] = ArrayUtils.GetNextWrapped(this.Checkpoints, checkpoint);
+            if (nextCheckpoints[vehicleInfo] == this.Checkpoints[1])
+            {
+                currentLaps[vehicleInfo]++;
+            }
+            Debug.Log($"Checkpoint {checkpointIndex + 1}");
+        }
     }
 
     private void HideCheckpoints()
