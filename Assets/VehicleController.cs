@@ -3,8 +3,6 @@ using UnityEngine;
 
 public class VehicleController : MonoBehaviour
 {
-    public GameObject FrontWheels;
-    public GameObject BackWheels;
     public float Acceleration = 1;
     public float MaxSpeed = 1;
     public float Drag = 1;
@@ -43,7 +41,10 @@ public class VehicleController : MonoBehaviour
             degradedVelocity = Vector3.zero;
         }
 
-        this.velocity = Vector3.ClampMagnitude(degradedVelocity + acceleratorValue * this.Acceleration * Time.deltaTime * this.transform.forward, this.MaxSpeed);
+        var velocityAfterAcceleration = degradedVelocity + acceleratorValue * this.Acceleration * Time.deltaTime * this.transform.forward;
+        var orthogonalComponent = Vector3.Dot(velocityAfterAcceleration, this.transform.right);
+        var velocityAfterTurn = velocityAfterAcceleration - orthogonalComponent * this.transform.right * this.Grip;
+        this.velocity = Vector3.ClampMagnitude(velocityAfterTurn, this.MaxSpeed);
         this.transform.Rotate(this.transform.up, this.steeringValue * this.Steering);
         var rotationOverlaps = Physics.OverlapBox(this.transform.position, this.transform.lossyScale / 2, this.transform.rotation)
             .Where(collider => collider is BoxCollider && !collider.gameObject.transform.IsChildOf(this.transform));
@@ -74,7 +75,8 @@ public class VehicleController : MonoBehaviour
 
     private void Bounce(Vector3 normal)
     {
-        var updatedVelocity = this.velocity - 2 * normal * Vector3.Dot(this.velocity, normal);
+        var velocityInNormal = normal * Vector3.Dot(this.velocity, normal);
+        var updatedVelocity = this.velocity - velocityInNormal - Mathf.Max(velocityInNormal.magnitude, this.NudgeAwayStrength) * velocityInNormal.normalized;
         this.velocity = new Vector3(updatedVelocity.x, 0, updatedVelocity.z);
     }
 }
