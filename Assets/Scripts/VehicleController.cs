@@ -55,8 +55,6 @@ public class VehicleController : MonoBehaviour
             var normalToCollision = (this.transform.position - hitPoint).normalized;
             this.velocity = this.velocity - Vector3.Dot(this.velocity, normalToCollision) * normalToCollision + normalToCollision * this.NudgeAwayStrength;
             this.transform.Translate(this.velocity, Space.World);
-            Debug.Log($"ROTATION BOUNCE {Time.realtimeSinceStartup}");
-            Debug.Log(normalToCollision);
             return;
         }
 
@@ -65,8 +63,6 @@ public class VehicleController : MonoBehaviour
         if (castHits.Any())
         {
             this.Bounce(castHits.First().normal);
-            Debug.Log($"Normal BOUNCE {Time.realtimeSinceStartup}");
-            Debug.Log(castHits.First().normal);
             return;
         }
 
@@ -80,7 +76,7 @@ public class VehicleController : MonoBehaviour
 
     private void Bounce(Vector3 normal)
     {
-        if (float.IsNaN(normal.x) || float.IsNaN(normal.y) || float.IsNaN(normal.z))
+        if (normal.IsInvalid())
         {
             return;
         }
