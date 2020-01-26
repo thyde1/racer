@@ -8,16 +8,14 @@ public class CheckpointWatcher : MonoBehaviour
 {
     public GameObject[] Checkpoints;
     public Dictionary<VehicleInfo, GameObject> nextCheckpoints { get; private set; }
-    public Dictionary<VehicleInfo, int> currentLaps { get; private set; }
-    private IEnumerable<GameObject> vehicles;
+    private IEnumerable<VehicleInfo> vehicles;
 
     // Use this for initialization
     void Start()
     {
         this.HideCheckpoints();
-        this.vehicles = FindObjectsOfType<VehicleInfo>().Select(v => v.gameObject);
+        this.vehicles = FindObjectsOfType<VehicleInfo>();
         this.nextCheckpoints = this.vehicles.ToDictionary(v => v.GetComponent<VehicleInfo>(), v => this.Checkpoints.First());
-        this.currentLaps = this.vehicles.ToDictionary(v => v.GetComponent<VehicleInfo>(), v => 0);
         foreach (var c in this.Checkpoints)
         {
             var checkpoint = c.AddComponent<Checkpoint>();
@@ -26,17 +24,32 @@ public class CheckpointWatcher : MonoBehaviour
         }
     }
 
-    internal void VehiclePassedCheckpoint(GameObject checkpoint, VehicleInfo vehicleInfo)
+    private void FixedUpdate()
     {
-        var checkpointIndex = Array.IndexOf(this.Checkpoints, checkpoint);
+        var orderedVehicles = this.vehicles
+            .OrderByDescending(v => v.CurrentLap)
+            .ThenByDescending(v => {
+                var checkpointIndex = Array.IndexOf(this.Checkpoints, nextCheckpoints[v]);
+                return checkpointIndex == 0 ? this.Checkpoints.Count() : checkpointIndex; // If next checkpoint is 0, better than next checkpoint is 5
+            })
+            .ThenBy(v => Vector3.Distance(v.transform.position, nextCheckpoints[v].transform.position));
+        var position = 0;
+        foreach (var vehicle in orderedVehicles)
+        {
+            position++;
+            vehicle.Position = position;
+        }
+    }
+
+    public void VehiclePassedCheckpoint(GameObject checkpoint, VehicleInfo vehicleInfo)
+    {
         if (nextCheckpoints[vehicleInfo] == checkpoint)
         {
             nextCheckpoints[vehicleInfo] = ArrayUtils.GetNextWrapped(this.Checkpoints, checkpoint);
             if (nextCheckpoints[vehicleInfo] == this.Checkpoints[1])
             {
-                currentLaps[vehicleInfo]++;
+                vehicleInfo.CurrentLap++;
             }
-            Debug.Log($"Checkpoint {checkpointIndex + 1}");
         }
     }
 

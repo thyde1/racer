@@ -7,19 +7,16 @@ using System.Linq;
 public class RaceController : MonoBehaviour
 {
     private IEnumerable<VehicleController> vehicles;
-    private CheckpointWatcher checkpointWatcher;
     private bool raceStarted = false;
 
     public TimeSpan time { get; private set; }
-
-    public int CurrentLap => this.checkpointWatcher.currentLaps.Values.First();
 
     // Use this for initialization
     void Start()
     {
         this.vehicles = FindObjectsOfType<VehicleController>();
-        this.checkpointWatcher = FindObjectOfType<CheckpointWatcher>();
         this.time = TimeSpan.FromSeconds(-3);
+        FindObjectOfType<HudController>().Vehicle = this.vehicles.SingleOrDefault(v => v.GetComponent<VehicleInfo>().Player == 1).GetComponent<VehicleInfo>();
     }
 
     // Update is called once per frame

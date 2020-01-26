@@ -7,10 +7,15 @@ using UnityEngine.UI;
 public class HudController : MonoBehaviour
 {
     public GameObject TimeLabel;
+    public GameObject LapLabel;
+    public GameObject PositionLabel;
     public GameObject CountdownLabel;
+    public VehicleInfo Vehicle { private get; set; }
 
     private RaceController raceController;
     private Text timeText;
+    private Text lapText;
+    private Text positionText;
     private Text countdownText;
 
     // Start is called before the first frame update
@@ -18,6 +23,8 @@ public class HudController : MonoBehaviour
     {
         this.raceController = FindObjectOfType<RaceController>();
         this.timeText = TimeLabel.GetComponent<Text>();
+        this.lapText = LapLabel.GetComponent<Text>();
+        this.positionText = PositionLabel.GetComponent<Text>();
         this.countdownText = CountdownLabel.GetComponent<Text>();
     }
 
@@ -28,6 +35,8 @@ public class HudController : MonoBehaviour
         this.countdownText.text = countdownNumber == 0 ? "GO!" : (countdownNumber > 0 ? countdownNumber.ToString("0") : "");
 
         var time = raceController.time < TimeSpan.Zero ? TimeSpan.Zero : raceController.time;
-        timeText.text = $"Lap {raceController.CurrentLap}\n{time.ToString(@"mm\:ss\.ff")}";
+        timeText.text = $"{time.ToString(@"mm\:ss\.ff")}";
+        lapText.text = $"Lap {this.Vehicle.CurrentLap}";
+        positionText.text = Ordinal.GetOrdinal(this.Vehicle.Position);
     }
 }
