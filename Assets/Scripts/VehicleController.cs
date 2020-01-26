@@ -10,15 +10,8 @@ public class VehicleController : MonoBehaviour
     public float Grip = 1;
     public float NudgeAwayStrength = 1;
     public Vector3 velocity;
-    private Camera myCamera;
     private float acceleratorValue;
     private float steeringValue;
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        this.myCamera = this.GetComponentInChildren<Camera>();
-    }
 
     public void HandleInput(float acceleratorValue, float steeringValue)
     {
@@ -50,16 +43,6 @@ public class VehicleController : MonoBehaviour
         this.HandleCollisions();
 
         this.transform.Translate(this.velocity, Space.World);
-    }
-
-    private void LateUpdate()
-    {
-        if (this.myCamera == null)
-        {
-            return;
-        }
-
-        this.myCamera.transform.SetPositionAndRotation(this.myCamera.transform.parent.position + new Vector3(0, 80, -30), Quaternion.Euler(this.myCamera.transform.rotation.eulerAngles.x, 0, 0));
     }
 
     private void HandleCollisions()
