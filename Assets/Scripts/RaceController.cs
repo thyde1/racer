@@ -6,7 +6,7 @@ using System.Linq;
 
 public class RaceController : MonoBehaviour
 {
-    private IEnumerable<VehicleController> vehicles;
+    private IEnumerable<VehicleInfo> vehicles;
     private bool raceStarted = false;
 
     public TimeSpan time { get; private set; }
@@ -14,9 +14,9 @@ public class RaceController : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        this.vehicles = FindObjectsOfType<VehicleController>();
+        this.vehicles = FindObjectsOfType<VehicleInfo>();
         this.time = TimeSpan.FromSeconds(-3);
-        FindObjectOfType<HudController>().Vehicle = this.vehicles.SingleOrDefault(v => v.GetComponent<VehicleInfo>().Player == 1).GetComponent<VehicleInfo>();
+        FindObjectOfType<HudController>().Vehicle = this.vehicles.SingleOrDefault(v => v.Player == 1);
     }
 
     // Update is called once per frame
@@ -32,16 +32,17 @@ public class RaceController : MonoBehaviour
 
     private void ActivateVehicles()
     {
-        var player1Vehicle = vehicles.SingleOrDefault(v => v.GetComponent<VehicleInfo>().Player == 1);
-        if (player1Vehicle == null)
+        var playerVehicles = vehicles.Where(v => v.GetComponent<VehicleInfo>().Player > 0);
+        foreach (var playerVehicle in playerVehicles)
         {
-            throw new Exception("There was no player one vehicle");
+            var playerInputController = playerVehicle.gameObject.AddComponent<PlayerInputController>();
+            playerInputController.VehicleController = playerVehicle.GetComponent<VehicleController>();
+            playerInputController.PlayerNumber = playerVehicle.GetComponent<VehicleInfo>().Player;
         }
 
-        player1Vehicle.gameObject.AddComponent<PlayerInputController>().VehicleController = player1Vehicle;
-        foreach (var vehicle in vehicles.Except(new[] { player1Vehicle }))
+        foreach (var vehicle in vehicles.Except(playerVehicles))
         {
-            vehicle.gameObject.AddComponent<AIInputController>().VehicleController = vehicle;
+            vehicle.gameObject.AddComponent<AIInputController>().VehicleController = vehicle.GetComponent<VehicleController>();
         }
     }
 }

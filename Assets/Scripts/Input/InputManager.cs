@@ -3,8 +3,8 @@ using System.Collections;
 
 public class InputManager
 {
-    public float GetValue(string axis)
+    public float GetValue(int playerNumber, string axis)
     {
-        return Input.GetAxis(axis);
+        return Input.GetAxis($"P{playerNumber} {axis}");
     }
 }
