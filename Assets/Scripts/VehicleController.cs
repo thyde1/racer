@@ -71,7 +71,7 @@ public class VehicleController : MonoBehaviour
             return;
         }
 
-        this.myCamera.transform.SetPositionAndRotation(this.myCamera.transform.position, Quaternion.Euler(90, 0, 0));
+        this.myCamera.transform.SetPositionAndRotation(this.myCamera.transform.parent.position + new Vector3(0, 80, -30), Quaternion.Euler(this.myCamera.transform.rotation.eulerAngles.x, 0, 0));
     }
 
     private void Bounce(Vector3 normal)
