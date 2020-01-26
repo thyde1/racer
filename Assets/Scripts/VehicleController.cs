@@ -81,7 +81,7 @@ public class VehicleController : MonoBehaviour
             .Where(hit => this.ShouldCollideWith(hit.collider));
         if (castHits.Any())
         {
-            var hit = castHits.First();
+            var hit = castHits.OrderBy(h => h.distance).First();
             this.Bounce(hit.collider, hit.normal);
             return;
         }
