@@ -41,25 +41,8 @@ public class VehicleController : MonoBehaviour
         var velocityAfterTurn = velocityAfterAcceleration - orthogonalComponent * this.transform.right * this.Grip;
         this.velocity = Vector3.ClampMagnitude(velocityAfterTurn, this.MaxSpeed);
         this.transform.Rotate(this.transform.up, this.steeringValue * this.Steering);
-        var rotationOverlaps = Physics.OverlapBox(this.transform.position, this.transform.lossyScale / 2, this.transform.rotation)
-            .Where(this.ShouldCollideWith);
-        if (rotationOverlaps.Any())
-        {
-            var collider = rotationOverlaps.First();
-            var hitPoint = collider.ClosestPoint(this.transform.position);
-            var normalToCollision = (this.transform.position - hitPoint).normalized;
-            this.velocity = this.velocity - Vector3.Dot(this.velocity, normalToCollision) * normalToCollision + normalToCollision * this.NudgeAwayStrength;
-            this.transform.Translate(this.velocity, Space.World);
-            return;
-        }
 
-        var castHits = Physics.BoxCastAll(this.transform.position, this.transform.lossyScale / 2, this.velocity.normalized, this.transform.rotation, this.velocity.magnitude)
-            .Where(hit => this.ShouldCollideWith(hit.collider));
-        if (castHits.Any())
-        {
-            this.Bounce(castHits.First().normal);
-            return;
-        }
+        this.HandleCollisions();
 
         this.transform.Translate(this.velocity, Space.World);
     }
@@ -74,6 +57,30 @@ public class VehicleController : MonoBehaviour
         this.myCamera.transform.SetPositionAndRotation(this.myCamera.transform.parent.position + new Vector3(0, 80, -30), Quaternion.Euler(this.myCamera.transform.rotation.eulerAngles.x, 0, 0));
     }
 
+    private void HandleCollisions()
+    {
+        var rotationOverlaps = Physics.OverlapBox(this.transform.position, this.transform.lossyScale / 2, this.transform.rotation)
+            .Where(this.ShouldCollideWith);
+        if (rotationOverlaps.Any())
+        {
+            foreach (var collider in rotationOverlaps)
+            {
+                var hitPoint = collider.ClosestPoint(this.transform.position);
+                var normalToCollision = (this.transform.position - hitPoint).normalized;
+                this.velocity = this.velocity - Vector3.Dot(this.velocity, normalToCollision) * normalToCollision + normalToCollision * this.NudgeAwayStrength;
+            }
+            return;
+        }
+
+        var castHits = Physics.BoxCastAll(this.transform.position, this.transform.lossyScale / 2, this.velocity.normalized, this.transform.rotation, this.velocity.magnitude)
+            .Where(hit => this.ShouldCollideWith(hit.collider));
+        if (castHits.Any())
+        {
+            this.Bounce(castHits.First().normal);
+            return;
+        }
+    }
+
     private void Bounce(Vector3 normal)
     {
         if (Vector3Utils.IsInvalid(normal))
@@ -84,7 +91,6 @@ public class VehicleController : MonoBehaviour
         var velocityInNormal = normal * Vector3.Dot(this.velocity, normal.normalized);
         var updatedVelocity = this.velocity - velocityInNormal - Mathf.Max(velocityInNormal.magnitude, this.NudgeAwayStrength) * velocityInNormal.normalized;
         this.velocity = new Vector3(updatedVelocity.x, 0, updatedVelocity.z);
-        this.transform.Translate(this.velocity, Space.World);
     }
 
     private bool ShouldCollideWith(Collider collider)
