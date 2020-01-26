@@ -7,7 +7,7 @@ using System;
 public class CheckpointWatcher : MonoBehaviour
 {
     public GameObject[] Checkpoints;
-    private Dictionary<VehicleInfo, GameObject> nextCheckpoints;
+    public Dictionary<VehicleInfo, GameObject> nextCheckpoints { get; private set; }
     public Dictionary<VehicleInfo, int> currentLaps { get; private set; }
     private IEnumerable<GameObject> vehicles;
 
