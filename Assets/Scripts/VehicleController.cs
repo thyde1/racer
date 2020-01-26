@@ -9,10 +9,10 @@ public class VehicleController : MonoBehaviour
     public float Steering = 1;
     public float Grip = 1;
     public float NudgeAwayStrength = 1;
+    public Vector3 velocity;
     private Camera myCamera;
     private float acceleratorValue;
     private float steeringValue;
-    private Vector3 velocity;
 
     // Start is called before the first frame update
     void Start()
@@ -24,6 +24,11 @@ public class VehicleController : MonoBehaviour
     {
         this.acceleratorValue = acceleratorValue;
         this.steeringValue = steeringValue;
+    }
+
+    public void HandleVehicleCollision(VehicleController other)
+    {
+        this.velocity += other.velocity;
     }
 
     private void FixedUpdate()
@@ -76,12 +81,13 @@ public class VehicleController : MonoBehaviour
             .Where(hit => this.ShouldCollideWith(hit.collider));
         if (castHits.Any())
         {
-            this.Bounce(castHits.First().normal);
+            var hit = castHits.First();
+            this.Bounce(hit.collider, hit.normal);
             return;
         }
     }
 
-    private void Bounce(Vector3 normal)
+    private void Bounce(Collider collider, Vector3 normal)
     {
         if (Vector3Utils.IsInvalid(normal))
         {
@@ -89,8 +95,19 @@ public class VehicleController : MonoBehaviour
         }
 
         var velocityInNormal = normal * Vector3.Dot(this.velocity, normal.normalized);
-        var updatedVelocity = this.velocity - velocityInNormal - Mathf.Max(velocityInNormal.magnitude, this.NudgeAwayStrength) * velocityInNormal.normalized;
-        this.velocity = new Vector3(updatedVelocity.x, 0, updatedVelocity.z);
+
+        var otherVehicle = collider.GetComponent<VehicleController>();
+        if (otherVehicle != null)
+        {
+            otherVehicle.HandleVehicleCollision(this);
+            var updatedVelocity = this.velocity - velocityInNormal;
+            this.velocity = new Vector3(updatedVelocity.x, 0, updatedVelocity.z);
+        }
+        else
+        {
+            var updatedVelocity = this.velocity - velocityInNormal - Mathf.Max(velocityInNormal.magnitude, this.NudgeAwayStrength) * velocityInNormal.normalized;
+            this.velocity = new Vector3(updatedVelocity.x, 0, updatedVelocity.z);
+        }
     }
 
     private bool ShouldCollideWith(Collider collider)
