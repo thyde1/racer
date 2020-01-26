@@ -8,6 +8,7 @@ public class RaceController : MonoBehaviour
 {
     private IEnumerable<VehicleController> vehicles;
     private CheckpointWatcher checkpointWatcher;
+    private bool raceStarted = false;
 
     public TimeSpan time { get; private set; }
 
@@ -25,17 +26,25 @@ public class RaceController : MonoBehaviour
     void Update()
     {
         this.time = this.time.Add(TimeSpan.FromSeconds(Time.deltaTime));
-        if (this.time > TimeSpan.Zero)
+        if (!raceStarted && this.time > TimeSpan.Zero)
         {
             this.ActivateVehicles();
+            this.raceStarted = true;
         }
     }
 
     private void ActivateVehicles()
     {
-        foreach (var vehicle in this.vehicles)
+        var player1Vehicle = vehicles.SingleOrDefault(v => v.GetComponent<VehicleInfo>().Player == 1);
+        if (player1Vehicle == null)
         {
-            vehicle.enabled = true;
+            throw new Exception("There was no player one vehicle");
+        }
+
+        player1Vehicle.gameObject.AddComponent<PlayerInputController>().VehicleController = player1Vehicle;
+        foreach (var vehicle in vehicles.Except(new[] { player1Vehicle }))
+        {
+            vehicle.gameObject.AddComponent<AIInputController>().VehicleController = vehicle;
         }
     }
 }

@@ -20,15 +20,10 @@ public class VehicleController : MonoBehaviour
         this.myCamera = this.GetComponentInChildren<Camera>();
     }
 
-    // Update is called once per frame
-    void Update()
+    public void HandleInput(float acceleratorValue, float steeringValue)
     {
-        var upValue = Input.GetKey(KeyCode.W) ? 1 : 0;
-        var downValue = Input.GetKey(KeyCode.S) ? -1 : 0;
-        this.acceleratorValue = upValue + downValue;
-        var leftValue = Input.GetKey(KeyCode.A) ? -1 : 0;
-        var rightValue = Input.GetKey(KeyCode.D) ? 1 : 0;
-        this.steeringValue = leftValue + rightValue;
+        this.acceleratorValue = acceleratorValue;
+        this.steeringValue = steeringValue;
     }
 
     private void FixedUpdate()
@@ -71,6 +66,11 @@ public class VehicleController : MonoBehaviour
 
     private void LateUpdate()
     {
+        if (this.myCamera == null)
+        {
+            return;
+        }
+
         this.myCamera.transform.SetPositionAndRotation(this.myCamera.transform.position, Quaternion.Euler(90, 0, 0));
     }
 
