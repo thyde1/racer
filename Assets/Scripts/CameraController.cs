@@ -22,7 +22,10 @@ public class CameraController : MonoBehaviour
         this.myCamera.transform.SetPositionAndRotation(centrePosition + new Vector3(0, 80, -30), Quaternion.Euler(70, 0, 0));
         while (!AreAllTargetsVisible())
         {
-            this.myCamera.transform.SetPositionAndRotation(centrePosition + new Vector3(0, this.myCamera.transform.position.y + 1, -30), Quaternion.Euler(70, 0, 0));
+            this.myCamera.transform.SetPositionAndRotation(
+                this.transform.position - this.transform.forward.normalized * 0.1f,
+                Quaternion.Euler(70, 0, 0)
+            );
         }
     }
 
