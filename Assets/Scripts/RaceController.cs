@@ -6,7 +6,8 @@ using System.Linq;
 
 public class RaceController : MonoBehaviour
 {
-    public Setup Setup { private get; set; }
+    public int Players { private get; set; }
+    public int Laps { private get; set; }
 
     public TimeSpan time { get; private set; }
 

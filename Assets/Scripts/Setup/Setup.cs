@@ -7,6 +7,8 @@ public class Setup : MonoBehaviour
     public Dropdown PlayersDropdown;
 
     public Dropdown LapsDropdown;
+    private int players;
+    private int laps;
 
     private void Start()
     {
@@ -15,8 +17,8 @@ public class Setup : MonoBehaviour
 
     public void StartGame()
     {
-        var players = int.Parse(this.PlayersDropdown.options[this.PlayersDropdown.value].text);
-        var laps = int.Parse(this.LapsDropdown.options[this.LapsDropdown.value].text);
+        this.players = int.Parse(this.PlayersDropdown.options[this.PlayersDropdown.value].text);
+        this.laps = int.Parse(this.LapsDropdown.options[this.LapsDropdown.value].text);
         var track = "Debug";
         SceneManager.LoadSceneAsync(track, LoadSceneMode.Additive);
     }
@@ -25,7 +27,8 @@ public class Setup : MonoBehaviour
     {
         SceneManager.UnloadSceneAsync(this.gameObject.scene);
         var raceController = FindObjectOfType<RaceController>();
-        raceController.Setup = this;
+        raceController.Players = this.players;
+        raceController.Laps = this.laps;
         raceController.enabled = true;
         FindObjectOfType<HudController>().enabled = true;
         SceneManager.sceneLoaded -= this.SceneManager_sceneLoaded;
