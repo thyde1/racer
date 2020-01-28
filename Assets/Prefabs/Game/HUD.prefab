@@ -345,7 +345,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5209499671740103571}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0257f23d56fef12498f283c9af099eab, type: 3}
   m_Name: 
@@ -353,7 +353,6 @@ MonoBehaviour:
   TimeLabel: {fileID: 2187408884855405}
   LapLabel: {fileID: 8568915449167394493}
   PositionLabel: {fileID: 1403671606116560989}
-  Vehicle: {fileID: 0}
   CountdownLabel: {fileID: 570353024486547584}
 --- !u!1 &8568915449167394493
 GameObject:

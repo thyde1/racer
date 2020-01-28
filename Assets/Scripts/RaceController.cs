@@ -6,10 +6,12 @@ using System.Linq;
 
 public class RaceController : MonoBehaviour
 {
-    private IEnumerable<VehicleInfo> vehicles;
-    private bool raceStarted = false;
+    public Setup Setup { private get; set; }
 
     public TimeSpan time { get; private set; }
+
+    private IEnumerable<VehicleInfo> vehicles;
+    private bool raceStarted = false;
 
     // Use this for initialization
     void Start()
