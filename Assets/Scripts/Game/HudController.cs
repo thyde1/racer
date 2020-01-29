@@ -38,5 +38,9 @@ public class HudController : MonoBehaviour
         timeText.text = $"{time.ToString(@"mm\:ss\.ff")}";
         lapText.text = $"Lap {this.Vehicle.CurrentLap}";
         positionText.text = Ordinal.GetOrdinal(this.Vehicle.Position);
+        if (this.raceController.Status == RaceStatus.Finished)
+        {
+            this.countdownText.text = "RACE OVER!!!";
+        }
     }
 }

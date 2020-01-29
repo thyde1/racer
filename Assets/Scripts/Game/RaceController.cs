@@ -15,11 +15,15 @@ public class RaceController : MonoBehaviour
     void Start()
     {
         this.vehicles = FindObjectsOfType<VehicleInfo>().OrderBy(v => v.Position).ToArray();
+        foreach (var vehicle in this.vehicles)
+        {
+            vehicle.OnLapFinished.AddListener(this.CheckForRaceFinished);
+        }
         this.time = TimeSpan.FromSeconds(-3);
         this.AssignPlayersToVehicles();
         var player1Vehicle = this.vehicles.SingleOrDefault(v => v.Player == 1);
         var hudController = FindObjectOfType<HudController>();
-        var playerVehicles = this.vehicles.Where(v => v.Player > 0);
+        var playerVehicles = this.vehicles.Where(v => v.IsPlayerControlled);
         var camera = FindObjectOfType<CameraController>();
         camera.SetTargets(playerVehicles.Any() ? playerVehicles : vehicles);
         hudController.Vehicle = player1Vehicle ?? this.vehicles.First();
@@ -58,7 +62,7 @@ public class RaceController : MonoBehaviour
 
     private void ActivateVehicles()
     {
-        var playerVehicles = vehicles.Where(v => v.GetComponent<VehicleInfo>().Player > 0);
+        var playerVehicles = vehicles.Where(v => v.GetComponent<VehicleInfo>().IsPlayerControlled);
         foreach (var playerVehicle in playerVehicles)
         {
             var playerInputController = playerVehicle.gameObject.AddComponent<PlayerInputController>();
@@ -69,6 +73,14 @@ public class RaceController : MonoBehaviour
         foreach (var vehicle in vehicles.Except(playerVehicles))
         {
             vehicle.gameObject.AddComponent<AIInputController>().VehicleController = vehicle.GetComponent<VehicleController>();
+        }
+    }
+
+    private void CheckForRaceFinished()
+    {
+        if (this.vehicles.Where(v => v.IsPlayerControlled).All(v => v.CurrentLap > this.Laps))
+        {
+            this.Status = RaceStatus.Finished;
         }
     }
 }
