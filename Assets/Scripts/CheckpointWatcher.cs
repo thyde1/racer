@@ -22,9 +22,16 @@ public class CheckpointWatcher : MonoBehaviour
             checkpoint.Vehicles = this.vehicles;
             checkpoint.CheckpointWatcher = this;
         }
+
+        this.CalculatePositions();
     }
 
     private void FixedUpdate()
+    {
+        this.CalculatePositions();
+    }
+
+    private void CalculatePositions()
     {
         var orderedVehicles = this.vehicles
             .OrderByDescending(v => v.CurrentLap)

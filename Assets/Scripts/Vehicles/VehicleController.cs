@@ -3,13 +3,13 @@ using UnityEngine;
 
 public class VehicleController : MonoBehaviour
 {
-    public float Acceleration = 1;
-    public float MaxSpeed = 1;
-    public float Drag = 1;
-    public float Steering = 1;
-    public float Grip = 1;
-    public float NudgeAwayStrength = 1;
-    public Vector3 velocity;
+    public float Acceleration = 2;
+    public float MaxSpeed = 2;
+    public float Drag = 0.5f;
+    public float Steering = 4;
+    public float Grip = .05f;
+    public float NudgeAwayStrength = 0.1f;
+    public Vector3 velocity { get; private set; }
     private float acceleratorValue;
     private float steeringValue;
 

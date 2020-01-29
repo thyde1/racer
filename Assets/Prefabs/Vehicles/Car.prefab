@@ -54,6 +54,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -90,7 +91,7 @@ GameObject:
   - component: {fileID: 8800634866791416278}
   - component: {fileID: 8566176768794282076}
   - component: {fileID: 8771763689720280960}
-  - component: {fileID: -1125388361213032414}
+  - component: {fileID: 4818881512143459445}
   m_Layer: 0
   m_Name: Car
   m_TagString: Untagged
@@ -135,7 +136,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 8800634866791416279}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4c19d637dffb8f74db7d6f196eb87163, type: 3}
+  m_Script: {fileID: 11500000, guid: 441d1ea4b63ebdb438721a44cf8b3206, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Acceleration: 2
@@ -160,7 +161,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &-1125388361213032414
+--- !u!114 &4818881512143459445
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -169,6 +170,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 8800634866791416279}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ac317a6e38e12b049a7f6b1a9bbd85ad, type: 3}
+  m_Script: {fileID: 11500000, guid: d15b335072265ed43a752ba690f43494, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Player: 0
+  Position: 1
+  CurrentLap: 0

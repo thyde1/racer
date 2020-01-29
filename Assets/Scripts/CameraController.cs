@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System.Linq;
 using System.Collections.Generic;
 
@@ -11,8 +10,13 @@ public class CameraController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        this.targets = FindObjectsOfType<VehicleInfo>();
         this.myCamera = this.GetComponentInChildren<Camera>();
-        this.targets = FindObjectsOfType<VehicleInfo>().Where(v => v.Player > 0);
+    }
+
+    public void SetTargets(IEnumerable<VehicleInfo> targets)
+    {
+        this.targets = targets;
     }
 
     private void LateUpdate()

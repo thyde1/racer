@@ -1,7 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 public class RaceController : MonoBehaviour
@@ -11,15 +9,22 @@ public class RaceController : MonoBehaviour
 
     public TimeSpan time { get; private set; }
 
-    private IEnumerable<VehicleInfo> vehicles;
+    private VehicleInfo[] vehicles;
     private bool raceStarted = false;
 
     // Use this for initialization
     void Start()
     {
-        this.vehicles = FindObjectsOfType<VehicleInfo>();
+        this.vehicles = FindObjectsOfType<VehicleInfo>().OrderBy(v => v.Position).ToArray();
         this.time = TimeSpan.FromSeconds(-3);
-        FindObjectOfType<HudController>().Vehicle = this.vehicles.SingleOrDefault(v => v.Player == 1);
+        this.AssignPlayersToVehicles();
+        var player1Vehicle = this.vehicles.SingleOrDefault(v => v.Player == 1);
+        var hudController = FindObjectOfType<HudController>();
+        var playerVehicles = this.vehicles.Where(v => v.Player > 0);
+        var camera = FindObjectOfType<CameraController>();
+        camera.SetTargets(playerVehicles.Any() ? playerVehicles : vehicles);
+        hudController.Vehicle = player1Vehicle ?? this.vehicles.First();
+        hudController.enabled = true;
     }
 
     // Update is called once per frame
@@ -30,6 +35,25 @@ public class RaceController : MonoBehaviour
         {
             this.ActivateVehicles();
             this.raceStarted = true;
+        }
+    }
+
+    private void AssignPlayersToVehicles()
+    {
+        for (var vehicleNumber = 0; vehicleNumber < this.vehicles.Count(); vehicleNumber++)
+        {
+            var vehicle = vehicles[vehicleNumber];
+            if (vehicleNumber < this.Players)
+            {
+                
+                vehicle.Player = vehicleNumber + 1;
+                vehicle.GetComponentInChildren<MeshRenderer>().material.color = VehicleColors.PlayerColors[vehicleNumber];
+            }
+            else
+            {
+                vehicle.Player = 0;
+                vehicle.GetComponentInChildren<MeshRenderer>().material.color = VehicleColors.AIColor;
+            }
         }
     }
 

@@ -30,7 +30,6 @@ public class Setup : MonoBehaviour
         raceController.Players = this.players;
         raceController.Laps = this.laps;
         raceController.enabled = true;
-        FindObjectOfType<HudController>().enabled = true;
         SceneManager.sceneLoaded -= this.SceneManager_sceneLoaded;
     }
 }
