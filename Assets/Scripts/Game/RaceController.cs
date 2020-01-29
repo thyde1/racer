@@ -6,11 +6,10 @@ public class RaceController : MonoBehaviour
 {
     public int Players { private get; set; }
     public int Laps { private get; set; }
-
     public TimeSpan time { get; private set; }
+    public RaceStatus Status { get; private set; } = RaceStatus.PreRace;
 
     private VehicleInfo[] vehicles;
-    private bool raceStarted = false;
 
     // Use this for initialization
     void Start()
@@ -31,10 +30,10 @@ public class RaceController : MonoBehaviour
     void Update()
     {
         this.time = this.time.Add(TimeSpan.FromSeconds(Time.deltaTime));
-        if (!raceStarted && this.time > TimeSpan.Zero)
+        if (this.Status == RaceStatus.PreRace && this.time > TimeSpan.Zero)
         {
             this.ActivateVehicles();
-            this.raceStarted = true;
+            this.Status = RaceStatus.InProgress;
         }
     }
 
