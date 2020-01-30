@@ -10,6 +10,7 @@ public class RaceController : MonoBehaviour
     public RaceStatus Status { get; private set; } = RaceStatus.PreRace;
 
     private VehicleInfo[] vehicles;
+    private GameObject finishedMenu;
 
     // Use this for initialization
     void Start()
@@ -23,6 +24,8 @@ public class RaceController : MonoBehaviour
         this.AssignPlayersToVehicles();
         var player1Vehicle = this.vehicles.SingleOrDefault(v => v.Player == 1);
         var hudController = FindObjectOfType<HudController>();
+        this.finishedMenu = FindObjectOfType<FinishedMenuController>().gameObject;
+        this.finishedMenu.SetActive(false);
         var playerVehicles = this.vehicles.Where(v => v.IsPlayerControlled);
         var camera = FindObjectOfType<CameraController>();
         camera.SetTargets(playerVehicles.Any() ? playerVehicles : vehicles);
@@ -85,6 +88,7 @@ public class RaceController : MonoBehaviour
         if (this.vehicles.Where(v => v.IsPlayerControlled).All(v => v.Status == VehicleStatus.Finished))
         {
             this.Status = RaceStatus.Finished;
+            this.finishedMenu.SetActive(true);
         }
     }
 }
