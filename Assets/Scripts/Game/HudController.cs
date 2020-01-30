@@ -40,7 +40,7 @@ public class HudController : MonoBehaviour
         positionText.text = Ordinal.GetOrdinal(this.Vehicle.Position);
         if (this.raceController.Status == RaceStatus.Finished)
         {
-            this.countdownText.text = "RACE OVER!!!";
+            this.countdownText.text = $"You finished {positionText.text}";
         }
     }
 }

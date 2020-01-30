@@ -76,9 +76,13 @@ public class RaceController : MonoBehaviour
         }
     }
 
-    private void CheckForRaceFinished()
+    private void CheckForRaceFinished(VehicleInfo vehicle)
     {
-        if (this.vehicles.Where(v => v.IsPlayerControlled).All(v => v.CurrentLap > this.Laps))
+        if (vehicle.CurrentLap > this.Laps)
+        {
+            vehicle.Status = VehicleStatus.Finished;
+        }
+        if (this.vehicles.Where(v => v.IsPlayerControlled).All(v => v.Status == VehicleStatus.Finished))
         {
             this.Status = RaceStatus.Finished;
         }

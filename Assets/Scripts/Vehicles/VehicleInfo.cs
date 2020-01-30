@@ -3,12 +3,17 @@ using UnityEngine.Events;
 
 public class VehicleInfo : MonoBehaviour
 {
+    public class VehicleEvent : UnityEvent<VehicleInfo> { }
+
     public int Player = 1;
     public int Position = 1;
 
-    public UnityEvent OnLapFinished;
+    public VehicleStatus Status { get; set; } = VehicleStatus.Racing;
+
+    public VehicleEvent OnLapFinished = new VehicleEvent();
 
     private int currentLap = 0;
+
     public int CurrentLap
     {
         get
@@ -18,7 +23,7 @@ public class VehicleInfo : MonoBehaviour
         set
         {
             this.currentLap = value;
-            this.OnLapFinished.Invoke();
+            this.OnLapFinished.Invoke(this);
         }
     }
 

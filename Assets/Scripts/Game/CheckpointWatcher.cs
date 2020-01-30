@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System.Linq;
 using System.Collections.Generic;
 using System;
@@ -33,14 +32,15 @@ public class CheckpointWatcher : MonoBehaviour
 
     private void CalculatePositions()
     {
-        var orderedVehicles = this.vehicles
+        var finishedVehicles = this.vehicles.Where(v => v.Status == VehicleStatus.Finished);
+        var orderedVehicles = this.vehicles.Except(finishedVehicles)
             .OrderByDescending(v => v.CurrentLap)
             .ThenByDescending(v => {
                 var checkpointIndex = Array.IndexOf(this.Checkpoints, nextCheckpoints[v]);
                 return checkpointIndex == 0 ? this.Checkpoints.Count() : checkpointIndex; // If next checkpoint is 0, better than next checkpoint is 5
             })
             .ThenBy(v => Vector3.Distance(v.transform.position, nextCheckpoints[v].transform.position));
-        var position = 0;
+        var position = finishedVehicles.Count();
         foreach (var vehicle in orderedVehicles)
         {
             position++;
