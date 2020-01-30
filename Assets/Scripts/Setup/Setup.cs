@@ -19,7 +19,7 @@ public class Setup : MonoBehaviour
     {
         this.players = int.Parse(this.PlayersDropdown.options[this.PlayersDropdown.value].text);
         this.laps = int.Parse(this.LapsDropdown.options[this.LapsDropdown.value].text);
-        var track = "Debug";
+        var track = "Track 1";
         SceneManager.LoadSceneAsync(track, LoadSceneMode.Additive);
     }
 
