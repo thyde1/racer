@@ -30,19 +30,21 @@ public class TrackCreatorWindow : EditorWindow
         var groundMeshFilter = trackGround.GetComponent<MeshFilter>();
         groundMeshFilter.mesh = new Mesh();
         CreateCubeArc(track.transform, 5, 90);
-        CreateCubeArc(track.transform, 2, 90);
+        CreateCubeArc(track.transform, 1, 90);
     }
 
     private static void CreateCubeArc(Transform parent, float radius, float angle)
     {
         var segmentLength = 0.4f;
-        for (var t = 0f; t <= angle * Mathf.Deg2Rad; t += segmentLength)
-        {
+
+        var t = -segmentLength;
+        do {
+            t += segmentLength;
             var cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
             cube.transform.SetParent(parent);
-            cube.transform.localScale = new Vector3(1, 1, radius * segmentLength);
+            cube.transform.localScale = new Vector3(1, 1, (radius + 0.6f) * segmentLength);
             cube.transform.position = new Vector3(radius * Mathf.Cos(t), 0, radius * Mathf.Sin(t));
             cube.transform.rotation = Quaternion.Euler(0, -t * Mathf.Rad2Deg + 180, 0);
-        }
+        } while (t <= angle * Mathf.Deg2Rad);
     }
 }
