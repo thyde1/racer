@@ -36,31 +36,26 @@ public class TrackCreatorWindow : EditorWindow
         trackGround.transform.SetParent(track.transform);
         var groundMeshFilter = trackGround.GetComponent<MeshFilter>();
         groundMeshFilter.mesh = new Mesh();
-        CreateCubeArc(track.transform, width + 1, angle);
-        CreateCubeArc(track.transform, 1, angle);
+        CreateCubeArc(track.transform, width + 1, angle * Mathf.Deg2Rad);
+        CreateCubeArc(track.transform, 1, angle * Mathf.Deg2Rad);
     }
 
-    private static void CreateCubeArc(Transform parent, float radius, float angle)
+    private static void CreateCubeArc(Transform parent, float radius, float angleInRadians)
     {
+        var desiredSegmentLength = 0.4f;
+        var segments = Mathf.Ceil(angleInRadians / desiredSegmentLength);
+        var segmentLength = angleInRadians / segments;
+
         var arc = new GameObject("Arc");
         arc.transform.parent = parent;
-        var segmentLength = 0.4f;
 
-        var t = -segmentLength;
-        do {
-            t += segmentLength;
+        for (var t = segmentLength * 0.5f; t < angleInRadians; t+= segmentLength)
+        {
             var cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
             cube.transform.SetParent(arc.transform);
             cube.transform.localScale = new Vector3(1, 1, (radius + 0.6f) * segmentLength);
             cube.transform.position = new Vector3(radius * Mathf.Cos(t), 0, radius * Mathf.Sin(t));
             cube.transform.rotation = Quaternion.Euler(0, -t * Mathf.Rad2Deg + 180, 0);
-        } while (t <= angle * Mathf.Deg2Rad);
-
-        var firstCube = arc.transform.GetChild(0);
-        var lastCube = arc.transform.GetChild(arc.transform.childCount - 1);
-        firstCube.localScale = new Vector3(1, 1, firstCube.localScale.z * 0.5f);
-        firstCube.position -= firstCube.forward * firstCube.localScale.z * 0.5f;
-        lastCube.localScale = new Vector3(1, 1, lastCube.localScale.z * 0.5f);
-        lastCube.position += lastCube.forward * lastCube.localScale.z * 0.5f;
+        }
     }
 }
