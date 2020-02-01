@@ -93,7 +93,7 @@ public class TrackCreatorWindow : EditorWindow
         DoOverArc(radius, angleInRadians, true, (position, t, segmentLength) =>
         {
             var wall = GenerateWall(arc.transform);
-            wall.transform.localScale = new Vector3(this.wallThickness, 1, (radius + 0.6f) * segmentLength);
+            wall.transform.localScale = new Vector3(this.wallThickness, 1, (radius + 0.6f * this.wallThickness) * segmentLength);
             wall.transform.position = position;
             wall.transform.rotation = Quaternion.Euler(0, -t * Mathf.Rad2Deg + 180, 0);
             return true;
