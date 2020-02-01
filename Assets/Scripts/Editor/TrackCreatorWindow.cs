@@ -7,8 +7,9 @@ using UnityEngine;
 
 public class TrackCreatorWindow : EditorWindow
 {
-    private float width = 10f;
+    private float bendWidth = 10f;
     private float angle = 90f;
+    private float straightWidth;
 
     [MenuItem("Window/Track Creator")]
     public static void OpenWindow()
@@ -20,43 +21,50 @@ public class TrackCreatorWindow : EditorWindow
     private void OnGUI()
     {
         this.titleContent = new GUIContent("Track Creator");
+        GUILayout.Label("Bend");
         GUILayout.Label("Width");
-        float.TryParse(GUILayout.TextField(this.width.ToString()), out this.width);
+        float.TryParse(GUILayout.TextField(this.bendWidth.ToString()), out this.bendWidth);
         GUILayout.Label("Angle");
         float.TryParse(GUILayout.TextField(this.angle.ToString()), out this.angle);
-        if (GUILayout.Button("Generate"))
+        if (GUILayout.Button("Generate Bend"))
         {
-            CreateTrack(this.width, this.angle);
+            CreateBend(this.bendWidth, this.angle);
         };
 
+        GUILayout.Label("Straight");
+        GUILayout.Label("Width");
+        float.TryParse(GUILayout.TextField(this.bendWidth.ToString()), out this.straightWidth);
+        if (GUILayout.Button("Generate Straight"))
+        {
+            CreateStraight(this.straightWidth);
+        };
     }
 
-    public static void CreateTrack(float width, float angle)
+    public static void CreateBend(float width, float angle)
     {
-        var track = new GameObject("Track");
+        var track = new GameObject("Bend");
         var innerWall = CreateCubeArc(track.transform, 1, angle * Mathf.Deg2Rad);
-        var outerWall = CreateCubeArc(track.transform, width + 1, angle* Mathf.Deg2Rad);
+        var outerWall = CreateCubeArc(track.transform, width, angle* Mathf.Deg2Rad);
 
-        var trackGround = new GameObject("Ground", typeof(MeshRenderer), typeof(MeshFilter));
-        trackGround.transform.SetParent(track.transform);
-        var groundMeshFilter = trackGround.GetComponent<MeshFilter>();
-        var groundMesh = groundMeshFilter.sharedMesh = new Mesh();
         var innerVertices = DoOverArc(1, angle * Mathf.Deg2Rad, false, (pos, t, segmentLength) => pos);
-        var outerVertices = DoOverArc(width + 1, angle * Mathf.Deg2Rad, false, (pos, t, segmentLength) => pos);
-        groundMesh.vertices = innerVertices.Concat(outerVertices).ToArray();
-        groundMesh.uv = groundMesh.vertices.Select(v => new Vector2(v.x, v.z)).ToArray();
-        List<int> triangles = new List<int>();
-        for (int i = 0; i < innerVertices.Count() - 1; i++)
-        {
-            triangles.Add(i + 1);
-            triangles.Add(i + innerVertices.Count());
-            triangles.Add(i);
-            triangles.Add(i + innerVertices.Count() + 1);
-            triangles.Add(i + innerVertices.Count());
-            triangles.Add(i + 1);
-        }
+        var outerVertices = DoOverArc(width, angle * Mathf.Deg2Rad, false, (pos, t, segmentLength) => pos);
+        GenerateGround(innerVertices, outerVertices, track.transform);
+    }
 
-        groundMesh.triangles = triangles.ToArray();
+    public static void CreateStraight(float width)
+    {
+        var straight = new GameObject("Straight");
+        var innerWall = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        innerWall.transform.SetParent(straight.transform);
+        innerWall.transform.position = new Vector3(1, 0, 0);
+        innerWall.transform.localScale = new Vector3(1, 1, width - 1);
+        var outerWall = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        outerWall.transform.SetParent(straight.transform);
+        outerWall.transform.position = new Vector3(width, 0, 0);
+        outerWall.transform.localScale = new Vector3(1, 1, width - 1);
+        var innerVertices = new[] { innerWall.transform.position - (width - 1) * 0.5f * innerWall.transform.forward, innerWall.transform.position + (width - 1) * 0.5f * innerWall.transform.forward };
+        var outerVertices = new[] { outerWall.transform.position - (width - 1) * 0.5f * outerWall.transform.forward, outerWall.transform.position + (width - 1) * 0.5f * outerWall.transform.forward };
+        GenerateGround(innerVertices, outerVertices, straight.transform);
     }
 
     private static IEnumerable<T> DoOverArc<T>(float radius, float angleInRadians, bool doAtCentres, Func<Vector3, float, float, T> action)
@@ -89,5 +97,37 @@ public class TrackCreatorWindow : EditorWindow
         });
 
         return arc;
+    }
+
+    private static GameObject GenerateGround(IEnumerable<Vector3> innerVertices, IEnumerable<Vector3> outerVertices, Transform parent)
+    {
+        var trackGround = new GameObject("Ground", typeof(MeshRenderer), typeof(MeshFilter));
+        var groundMeshFilter = trackGround.GetComponent<MeshFilter>();
+        groundMeshFilter.sharedMesh = GenerateGroundMesh(innerVertices, outerVertices);
+        trackGround.transform.SetParent(parent);
+        return trackGround;
+    }
+
+    /// <summary>
+    /// Generates ground mesh for a section of track. Expects innerVertices.length == outerVertices.length
+    /// </summary>
+    private static Mesh GenerateGroundMesh(IEnumerable<Vector3> innerVertices, IEnumerable<Vector3> outerVertices)
+    {
+        var groundMesh = new Mesh();
+        groundMesh.vertices = innerVertices.Concat(outerVertices).ToArray();
+        groundMesh.uv = groundMesh.vertices.Select(v => new Vector2(v.x, v.z)).ToArray();
+        List<int> triangles = new List<int>();
+        for (int i = 0; i < innerVertices.Count() - 1; i++)
+        {
+            triangles.Add(i + 1);
+            triangles.Add(i + innerVertices.Count());
+            triangles.Add(i);
+            triangles.Add(i + innerVertices.Count() + 1);
+            triangles.Add(i + innerVertices.Count());
+            triangles.Add(i + 1);
+        }
+
+        groundMesh.triangles = triangles.ToArray();
+        return groundMesh;
     }
 }
