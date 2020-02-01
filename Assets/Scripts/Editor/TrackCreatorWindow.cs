@@ -56,12 +56,10 @@ public class TrackCreatorWindow : EditorWindow
     public static void CreateStraight(float width)
     {
         var straight = new GameObject("Straight");
-        var innerWall = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        innerWall.transform.SetParent(straight.transform);
+        var innerWall = GenerateWall(straight.transform);
         innerWall.transform.position = new Vector3(1, 0, 0);
         innerWall.transform.localScale = new Vector3(1, 1, width - 1);
-        var outerWall = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        outerWall.transform.SetParent(straight.transform);
+        var outerWall = GenerateWall(straight.transform);
         outerWall.transform.position = new Vector3(width, 0, 0);
         outerWall.transform.localScale = new Vector3(1, 1, width - 1);
         var innerVertices = new[] { innerWall.transform.position - (width - 1) * 0.5f * innerWall.transform.forward, innerWall.transform.position + (width - 1) * 0.5f * innerWall.transform.forward };
@@ -92,11 +90,10 @@ public class TrackCreatorWindow : EditorWindow
 
         DoOverArc(radius, angleInRadians, true, (position, t, segmentLength) =>
         {
-            var cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            cube.transform.SetParent(arc.transform);
-            cube.transform.localScale = new Vector3(1, 1, (radius + 0.6f) * segmentLength);
-            cube.transform.position = position;
-            cube.transform.rotation = Quaternion.Euler(0, -t * Mathf.Rad2Deg + 180, 0);
+            var wall = GenerateWall(arc.transform);
+            wall.transform.localScale = new Vector3(1, 1, (radius + 0.6f) * segmentLength);
+            wall.transform.position = position;
+            wall.transform.rotation = Quaternion.Euler(0, -t * Mathf.Rad2Deg + 180, 0);
             return true;
         });
 
@@ -109,7 +106,19 @@ public class TrackCreatorWindow : EditorWindow
         var groundMeshFilter = trackGround.GetComponent<MeshFilter>();
         groundMeshFilter.sharedMesh = GenerateGroundMesh(innerVertices, outerVertices);
         trackGround.transform.SetParent(parent);
+        var groundMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/Prefabs/World/TrackMaterial.mat");
+        trackGround.GetComponent<MeshRenderer>().sharedMaterial = groundMaterial;
         return trackGround;
+    }
+
+    private static GameObject GenerateWall(Transform parent)
+    {
+        var cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        cube.name = "Wall";
+        var wallMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/Prefabs/World/WallMaterial.mat"); ;
+        cube.GetComponent<MeshRenderer>().material = wallMaterial;
+        cube.transform.SetParent(parent);
+        return cube;
     }
 
     /// <summary>
