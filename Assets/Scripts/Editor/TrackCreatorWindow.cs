@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
@@ -30,45 +29,83 @@ public class TrackCreatorWindow : EditorWindow
         float.TryParse(GUILayout.TextField(this.angle.ToString()), out this.angle);
         if (GUILayout.Button("Generate Bend"))
         {
-            CreateBend(this.trackWidth, this.angle);
+            var bend = CreateBend(this.trackWidth, this.angle);
+            this.PositionCreatedGameObject(bend);
         };
 
         GUILayout.Label("Straight");
         if (GUILayout.Button("Generate Straight"))
         {
-            CreateStraight(this.trackWidth);
+            var straight = CreateStraight(this.trackWidth);
+            this.PositionCreatedGameObject(straight);
         };
     }
 
-    public void CreateBend(float width, float angle)
+    public GameObject CreateBend(float width, float angle)
     {
         var bend = new GameObject("Bend");
         var innerWall = CreateCubeArc(bend.transform, 1, angle * Mathf.Deg2Rad);
-        var outerWall = CreateCubeArc(bend.transform, width, angle* Mathf.Deg2Rad);
+        var outerWall = CreateCubeArc(bend.transform, width + 1, angle* Mathf.Deg2Rad);
 
         var innerVertices = DoOverArc(1, angle * Mathf.Deg2Rad, false, (pos, t, segmentLength) => pos);
-        var outerVertices = DoOverArc(width, angle * Mathf.Deg2Rad, false, (pos, t, segmentLength) => pos);
+        var outerVertices = DoOverArc(width + 1, angle * Mathf.Deg2Rad, false, (pos, t, segmentLength) => pos);
+        var centralVertices = DoOverArc(1 + width * 0.5f, angle * Mathf.Deg2Rad, false, (pos, t, segmentLength) => pos);
         GenerateGround(innerVertices, outerVertices, bend.transform);
 
-        bend.transform.SetPositionAndRotation(Selection.activeTransform.position, Selection.activeTransform.rotation);
-        Selection.activeGameObject = bend;
+        var startConnectionPoint = new GameObject("Start Connection Point");
+        startConnectionPoint.AddComponent<TrackConnectionPoint>().Type = TrackConnectionPoint.ConnectionType.Start;
+        startConnectionPoint.transform.SetParent(bend.transform);
+        startConnectionPoint.transform.localPosition = centralVertices.First();
+        var endConnectionPoint = new GameObject("End Connection Point");
+        endConnectionPoint.AddComponent<TrackConnectionPoint>().Type = TrackConnectionPoint.ConnectionType.End;
+        endConnectionPoint.transform.SetParent(bend.transform);
+        endConnectionPoint.transform.localPosition = centralVertices.Last();
+        endConnectionPoint.transform.localRotation = Quaternion.Euler(0, -angle, 0);
+
+        return bend;
     }
 
-    public void CreateStraight(float width)
+    public GameObject CreateStraight(float width)
     {
         var straight = new GameObject("Straight");
         var innerWall = GenerateWall(straight.transform);
-        innerWall.transform.position = new Vector3(1, 0, 0);
-        innerWall.transform.localScale = new Vector3(this.wallThickness, 1, width - 1);
+        innerWall.transform.position = new Vector3(-width * 0.5f, 0, 0);
+        innerWall.transform.localScale = new Vector3(this.wallThickness, 1, width);
         var outerWall = GenerateWall(straight.transform);
-        outerWall.transform.position = new Vector3(width, 0, 0);
-        outerWall.transform.localScale = new Vector3(this.wallThickness, 1, width - 1);
-        var innerVertices = new[] { innerWall.transform.position - (width - 1) * 0.5f * innerWall.transform.forward, innerWall.transform.position + (width - 1) * 0.5f * innerWall.transform.forward };
-        var outerVertices = new[] { outerWall.transform.position - (width - 1) * 0.5f * outerWall.transform.forward, outerWall.transform.position + (width - 1) * 0.5f * outerWall.transform.forward };
+        outerWall.transform.position = new Vector3(width * 0.5f, 0, 0);
+        outerWall.transform.localScale = new Vector3(this.wallThickness, 1, width);
+        var innerVertices = new[] { innerWall.transform.position - width * 0.5f * innerWall.transform.forward, innerWall.transform.position + width * 0.5f * innerWall.transform.forward };
+        var outerVertices = new[] { outerWall.transform.position - width * 0.5f * outerWall.transform.forward, outerWall.transform.position + width * 0.5f * outerWall.transform.forward };
         GenerateGround(innerVertices, outerVertices, straight.transform);
+        var startConnectionPoint = new GameObject("Start Connection Point");
+        startConnectionPoint.AddComponent<TrackConnectionPoint>().Type = TrackConnectionPoint.ConnectionType.Start;
+        startConnectionPoint.transform.SetParent(straight.transform);
+        startConnectionPoint.transform.localPosition = new Vector3(0, 0, -width * 0.5f);
+        var endConnectionPoint = new GameObject("End Connection Point");
+        endConnectionPoint.AddComponent<TrackConnectionPoint>().Type = TrackConnectionPoint.ConnectionType.End;
+        endConnectionPoint.transform.SetParent(straight.transform);
+        endConnectionPoint.transform.localPosition = new Vector3(0, 0, width * 0.5f);
 
-        straight.transform.SetPositionAndRotation(Selection.activeTransform.position, Selection.activeTransform.rotation);
-        Selection.activeGameObject = straight;
+        return straight;
+    }
+
+    private void PositionCreatedGameObject(GameObject gameObject)
+    {
+        if (Selection.activeTransform != null)
+        {
+            var startConnectionPoint = gameObject.GetComponentsInChildren<TrackConnectionPoint>().FirstOrDefault(c => c.Type == TrackConnectionPoint.ConnectionType.Start);
+            var endConnectionPoint = (Selection.activeGameObject.GetComponentsInChildren<TrackConnectionPoint>()).FirstOrDefault(c => c.Type == TrackConnectionPoint.ConnectionType.End);
+            // Rejig hierarchy to make connection points parents
+            TransformUtils.InvertParentChildRelationship(gameObject, startConnectionPoint.gameObject);
+            TransformUtils.InvertParentChildRelationship(Selection.activeGameObject, endConnectionPoint.gameObject);
+            // Position game object
+            startConnectionPoint.transform.SetPositionAndRotation(endConnectionPoint.transform.position, endConnectionPoint.transform.rotation);
+            // Revert hierarchy
+            TransformUtils.InvertParentChildRelationship(startConnectionPoint.gameObject, gameObject);
+            TransformUtils.InvertParentChildRelationship(endConnectionPoint.gameObject, Selection.activeGameObject);
+        }
+
+        Selection.activeGameObject = gameObject;
     }
 
     private IEnumerable<T> DoOverArc<T>(float radius, float angleInRadians, bool doAtCentres, Func<Vector3, float, float, T> action)
@@ -108,8 +145,8 @@ public class TrackCreatorWindow : EditorWindow
         var groundMeshFilter = trackGround.GetComponent<MeshFilter>();
         groundMeshFilter.sharedMesh = GenerateGroundMesh(innerVertices, outerVertices);
         trackGround.transform.SetParent(parent);
-        var groundMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/Prefabs/World/TrackMaterial.mat");
-        trackGround.GetComponent<MeshRenderer>().sharedMaterial = groundMaterial;
+        var trackMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/Prefabs/World/TrackMaterial.mat");
+        trackGround.GetComponent<MeshRenderer>().sharedMaterial = trackMaterial;
         return trackGround;
     }
 
