@@ -35,24 +35,29 @@ public class TrackCreatorWindow : EditorWindow
     {
         var track = new GameObject("Track");
         var innerWall = CreateCubeArc(track.transform, 1, angle * Mathf.Deg2Rad);
-        var outerWall = CreateCubeArc(track.transform, width +1, angle* Mathf.Deg2Rad);
+        var outerWall = CreateCubeArc(track.transform, width + 1, angle* Mathf.Deg2Rad);
 
         var trackGround = new GameObject("Ground", typeof(MeshRenderer), typeof(MeshFilter));
         trackGround.transform.SetParent(track.transform);
         var groundMeshFilter = trackGround.GetComponent<MeshFilter>();
         var groundMesh = groundMeshFilter.sharedMesh = new Mesh();
-        groundMesh.vertices = innerWall.transform.GetComponentsInChildren<MeshFilter>().SelectMany(filter => filter.mesh.vertices).ToArray();
+        var innerVertices = DoOverArc(1.5f, angle, (pos, t, segmentLength) => pos);
+        var outerVertices = DoOverArc(width + 0.5f, angle, (pos, t, segmentLength) => pos);
+        groundMesh.vertices = innerVertices.Concat(outerVertices).ToArray();
     }
 
-    private static void DoOverArc(float radius, float angleInRadians, Action<Vector3, float, float> action)
+    private static IEnumerable<T> DoOverArc<T>(float radius, float angleInRadians, Func<Vector3, float, float, T> action)
     {
         var desiredSegmentLength = 0.4f;
         var segments = Mathf.Ceil(angleInRadians / desiredSegmentLength);
         var segmentLength = angleInRadians / segments;
+        var results = new List<T>();
         for (var t = segmentLength * 0.5f; t < angleInRadians; t += segmentLength)
         {
-            action(new Vector3(radius * Mathf.Cos(t), 0, radius * Mathf.Sin(t)), t, segmentLength);
+            results.Add(action(new Vector3(radius * Mathf.Cos(t), 0, radius * Mathf.Sin(t)), t, segmentLength));
         }
+
+        return results;
     }
 
     private static GameObject CreateCubeArc(Transform parent, float radius, float angleInRadians)
@@ -67,6 +72,7 @@ public class TrackCreatorWindow : EditorWindow
             cube.transform.localScale = new Vector3(1, 1, (radius + 0.6f) * segmentLength);
             cube.transform.position = position;
             cube.transform.rotation = Quaternion.Euler(0, -t * Mathf.Rad2Deg + 180, 0);
+            return true;
         });
 
         return arc;
