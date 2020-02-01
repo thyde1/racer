@@ -41,18 +41,31 @@ public class TrackCreatorWindow : EditorWindow
         trackGround.transform.SetParent(track.transform);
         var groundMeshFilter = trackGround.GetComponent<MeshFilter>();
         var groundMesh = groundMeshFilter.sharedMesh = new Mesh();
-        var innerVertices = DoOverArc(1.5f, angle, (pos, t, segmentLength) => pos);
-        var outerVertices = DoOverArc(width + 0.5f, angle, (pos, t, segmentLength) => pos);
+        var innerVertices = DoOverArc(1, angle * Mathf.Deg2Rad, false, (pos, t, segmentLength) => pos);
+        var outerVertices = DoOverArc(width + 1, angle * Mathf.Deg2Rad, false, (pos, t, segmentLength) => pos);
         groundMesh.vertices = innerVertices.Concat(outerVertices).ToArray();
+        groundMesh.uv = groundMesh.vertices.Select(v => new Vector2(v.x, v.z)).ToArray();
+        List<int> triangles = new List<int>();
+        for (int i = 0; i < innerVertices.Count() - 1; i++)
+        {
+            triangles.Add(i + 1);
+            triangles.Add(i + innerVertices.Count());
+            triangles.Add(i);
+            triangles.Add(i + innerVertices.Count() + 1);
+            triangles.Add(i + innerVertices.Count());
+            triangles.Add(i + 1);
+        }
+
+        groundMesh.triangles = triangles.ToArray();
     }
 
-    private static IEnumerable<T> DoOverArc<T>(float radius, float angleInRadians, Func<Vector3, float, float, T> action)
+    private static IEnumerable<T> DoOverArc<T>(float radius, float angleInRadians, bool doAtCentres, Func<Vector3, float, float, T> action)
     {
         var desiredSegmentLength = 0.4f;
         var segments = Mathf.Ceil(angleInRadians / desiredSegmentLength);
         var segmentLength = angleInRadians / segments;
         var results = new List<T>();
-        for (var t = segmentLength * 0.5f; t < angleInRadians; t += segmentLength)
+        for (var t = doAtCentres ? segmentLength * 0.5f : 0; t < angleInRadians; t += segmentLength)
         {
             results.Add(action(new Vector3(radius * Mathf.Cos(t), 0, radius * Mathf.Sin(t)), t, segmentLength));
         }
@@ -65,7 +78,7 @@ public class TrackCreatorWindow : EditorWindow
         var arc = new GameObject("Arc");
         arc.transform.parent = parent;
 
-        DoOverArc(radius, angleInRadians, (position, t, segmentLength) =>
+        DoOverArc(radius, angleInRadians, true, (position, t, segmentLength) =>
         {
             var cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
             cube.transform.SetParent(arc.transform);
