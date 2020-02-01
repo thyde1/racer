@@ -71,11 +71,11 @@ public class TrackCreatorWindow : EditorWindow
 
     private static IEnumerable<T> DoOverArc<T>(float radius, float angleInRadians, bool doAtCentres, Func<Vector3, float, float, T> action)
     {
-        var desiredSegmentLength = 0.4f;
+        var desiredSegmentLength = 0.2f;
         var segments = Mathf.Ceil(angleInRadians / desiredSegmentLength);
         var segmentLength = angleInRadians / segments;
         var results = new List<T>();
-        for (var t = doAtCentres ? segmentLength * 0.5f : 0; t <= angleInRadians; t += segmentLength)
+        for (var t = doAtCentres ? segmentLength * 0.5f : 0; t < angleInRadians + segmentLength * 0.25f; t += segmentLength)
         {
             results.Add(action(new Vector3(radius * Mathf.Cos(t), 0, radius * Mathf.Sin(t)), t, segmentLength));
         }
