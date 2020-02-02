@@ -9,6 +9,7 @@ public class TrackCreatorWindow : EditorWindow
     private float trackWidth = 10f;
     private float angle = 90f;
     private float wallThickness = 1f;
+    private float wallHeight = 1f;
 
     [MenuItem("Window/Track Creator")]
     public static void OpenWindow()
@@ -20,6 +21,7 @@ public class TrackCreatorWindow : EditorWindow
     private void OnGUI()
     {
         this.titleContent = new GUIContent("Track Creator");
+        this.wallHeight = EditorGUILayout.FloatField("Wall Height", this.wallHeight);
         this.wallThickness = EditorGUILayout.FloatField("Wall Thickness", this.wallThickness);
         this.trackWidth = EditorGUILayout.FloatField("Width", this.trackWidth);
         this.angle = EditorGUILayout.FloatField("Angle", this.angle);
@@ -65,10 +67,10 @@ public class TrackCreatorWindow : EditorWindow
         var straight = new GameObject("Straight");
         var innerWall = GenerateWall(straight.transform);
         innerWall.transform.position = new Vector3(-width * 0.5f, 0, 0);
-        innerWall.transform.localScale = new Vector3(this.wallThickness, 1, width);
+        innerWall.transform.localScale = new Vector3(this.wallThickness, this.wallHeight, width);
         var outerWall = GenerateWall(straight.transform);
         outerWall.transform.position = new Vector3(width * 0.5f, 0, 0);
-        outerWall.transform.localScale = new Vector3(this.wallThickness, 1, width);
+        outerWall.transform.localScale = new Vector3(this.wallThickness, this.wallHeight, width);
         var innerVertices = new[] { innerWall.transform.position - width * 0.5f * innerWall.transform.forward, innerWall.transform.position + width * 0.5f * innerWall.transform.forward };
         var outerVertices = new[] { outerWall.transform.position - width * 0.5f * outerWall.transform.forward, outerWall.transform.position + width * 0.5f * outerWall.transform.forward };
         GenerateGround(innerVertices, outerVertices, straight.transform);
@@ -136,7 +138,7 @@ public class TrackCreatorWindow : EditorWindow
         DoOverArc(radius, angleInRadians, true, (position, t, segmentLength) =>
         {
             var wall = GenerateWall(arc.transform);
-            wall.transform.localScale = new Vector3(this.wallThickness, 1, (radius + 0.6f * this.wallThickness) * segmentLength);
+            wall.transform.localScale = new Vector3(this.wallThickness, this.wallHeight, (radius + 0.6f * this.wallThickness) * segmentLength);
             wall.transform.position = position;
             wall.transform.rotation = Quaternion.Euler(0, -t * Mathf.Rad2Deg + 180, 0);
             return true;
