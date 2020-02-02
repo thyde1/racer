@@ -147,6 +147,7 @@ MonoBehaviour:
   Grip: 0.05
   NudgeAwayStrength: 0.1
   CrashSound: {fileID: 8300000, guid: abc69d988b6c40d4d9bac7538097fe81, type: 3}
+  TyreSound: {fileID: 8300000, guid: 01284c91cab166d4c8640fe6c647c133, type: 3}
 --- !u!54 &8771763689720280960
 Rigidbody:
   m_ObjectHideFlags: 0

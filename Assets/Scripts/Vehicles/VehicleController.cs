@@ -11,11 +11,14 @@ public class VehicleController : MonoBehaviour
     public float Grip = .05f;
     public float NudgeAwayStrength = 0.1f;
     public AudioClip CrashSound;
+    public AudioClip TyreSound;
     public Vector3 velocity { get; private set; }
+
     private float acceleratorValue;
     private float steeringValue;
     private AudioSource audioSource;
     private AudioSource crashAudioSource;
+    private AudioSource tyreAudioSource;
 
     public void Start()
     {
@@ -55,6 +58,9 @@ public class VehicleController : MonoBehaviour
 
         this.audioSource.volume = Mathf.Clamp(this.velocity.magnitude / this.MaxSpeed, 0.1f, 1);
         this.audioSource.pitch = Mathf.Clamp(this.velocity.magnitude / this.MaxSpeed, 0.1f, 1);
+
+        var sidewaysSpeed = Mathf.Abs(Vector3.Dot(this.velocity, this.transform.right));
+        this.tyreAudioSource.volume = Mathf.Pow(sidewaysSpeed / this.MaxSpeed, 2);
     }
 
     private void HandleCollisions()
@@ -125,5 +131,12 @@ public class VehicleController : MonoBehaviour
         crashAudioSource.name = "Crash Audio Source";
         crashAudioSource.clip = this.CrashSound;
         AudioSourceConfigurer.ConfigureDefault(crashAudioSource);
+
+        this.tyreAudioSource = this.gameObject.AddComponent<AudioSource>();
+        tyreAudioSource.name = "Tyre Audio Source";
+        tyreAudioSource.clip = this.TyreSound;
+        tyreAudioSource.loop = true;
+        tyreAudioSource.Play();
+        AudioSourceConfigurer.ConfigureDefault(tyreAudioSource);
     }
 }
