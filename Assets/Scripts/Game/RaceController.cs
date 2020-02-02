@@ -27,7 +27,7 @@ public class RaceController : MonoBehaviour
         this.finishedMenu.SetActive(false);
         var playerVehicles = this.vehicles.Where(v => v.IsPlayerControlled);
         var camera = FindObjectOfType<CameraController>();
-        camera.SetTargets(playerVehicles.Any() ? playerVehicles : vehicles);
+        camera.SetTargets(playerVehicles.Any() ? playerVehicles : this.vehicles);
         hudController.Vehicle = player1Vehicle ?? this.vehicles.First();
         hudController.enabled = true;
     }
@@ -84,7 +84,8 @@ public class RaceController : MonoBehaviour
         {
             vehicle.Status = VehicleStatus.Finished;
         }
-        if (this.vehicles.Where(v => v.IsPlayerControlled).All(v => v.Status == VehicleStatus.Finished))
+        var playerVehicles = this.vehicles.Where(v => v.IsPlayerControlled);
+        if ((playerVehicles.Any() ? playerVehicles : this.vehicles).All(v => v.Status == VehicleStatus.Finished))
         {
             this.Status = RaceStatus.Finished;
             this.finishedMenu.SetActive(true);
@@ -99,7 +100,7 @@ public class RaceController : MonoBehaviour
         {
             var newVehicle = Instantiate(
                 vehicle,
-                firstCheckpoint.transform.position - firstCheckpoint.transform.forward * 7 * i + firstCheckpoint.transform.right * (i % 2 == 0 ? -5 : 5),
+                firstCheckpoint.transform.position - firstCheckpoint.transform.forward * 5 * i + firstCheckpoint.transform.right * (i % 2 == 0 ? -5 : 5),
                 firstCheckpoint.transform.rotation
             );
             SceneManager.MoveGameObjectToScene(newVehicle, this.gameObject.scene);
