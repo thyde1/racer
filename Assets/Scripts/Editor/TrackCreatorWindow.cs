@@ -25,17 +25,22 @@ public class TrackCreatorWindow : EditorWindow
         this.wallThickness = EditorGUILayout.FloatField("Wall Thickness", this.wallThickness);
         this.trackWidth = EditorGUILayout.FloatField("Width", this.trackWidth);
         this.angle = EditorGUILayout.FloatField("Angle", this.angle);
+
+        GameObject createdGameObject = null;
         if (GUILayout.Button("Generate Bend"))
         {
-            var bend = CreateBend(this.trackWidth, this.angle);
-            this.PositionCreatedGameObject(bend);
+            createdGameObject = CreateBend(this.trackWidth, this.angle);
         };
 
         if (GUILayout.Button("Generate Straight"))
         {
-            var straight = CreateStraight(this.trackWidth);
-            this.PositionCreatedGameObject(straight);
+            createdGameObject = CreateStraight(this.trackWidth);
         };
+        if (createdGameObject != null)
+        {
+            this.PositionCreatedGameObject(createdGameObject);
+            Selection.activeGameObject = createdGameObject;
+        }
     }
 
     public GameObject CreateBend(float width, float angle)
@@ -101,8 +106,6 @@ public class TrackCreatorWindow : EditorWindow
             TransformUtils.InvertParentChildRelationship(startConnectionPoint.gameObject, gameObject);
             TransformUtils.InvertParentChildRelationship(endConnectionPoint.gameObject, Selection.activeGameObject);
         }
-
-        Selection.activeGameObject = gameObject;
     }
 
     private IEnumerable<T> DoOverArc<T>(float radius, float angleInRadians, bool doAtCentres, Func<Vector3, float, float, T> action)
