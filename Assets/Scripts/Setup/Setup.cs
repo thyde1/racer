@@ -5,21 +5,18 @@ using UnityEngine.UI;
 public class Setup : MonoBehaviour
 {
     public Dropdown PlayersDropdown;
-
     public Dropdown LapsDropdown;
+    public Dropdown TrackDropdown;
+
     private int players;
     private int laps;
-
-    private void Start()
-    {
-        SceneManager.sceneLoaded += this.SceneManager_sceneLoaded;
-    }
 
     public void StartGame()
     {
         this.players = int.Parse(this.PlayersDropdown.options[this.PlayersDropdown.value].text);
         this.laps = int.Parse(this.LapsDropdown.options[this.LapsDropdown.value].text);
-        var track = "Track 1";
+        var track = this.TrackDropdown.options[this.TrackDropdown.value].text;
+        SceneManager.sceneLoaded += this.SceneManager_sceneLoaded;
         SceneManager.LoadSceneAsync(track, LoadSceneMode.Additive);
     }
 

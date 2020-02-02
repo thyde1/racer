@@ -96,7 +96,12 @@ public class TrackCreatorWindow : EditorWindow
         if (Selection.activeTransform != null)
         {
             var startConnectionPoint = gameObject.GetComponentsInChildren<TrackConnectionPoint>().FirstOrDefault(c => c.Type == TrackConnectionPoint.ConnectionType.Start);
-            var endConnectionPoint = (Selection.activeGameObject.GetComponentsInChildren<TrackConnectionPoint>()).FirstOrDefault(c => c.Type == TrackConnectionPoint.ConnectionType.End);
+            var endConnectionPoint = Selection.activeGameObject.GetComponentsInChildren<TrackConnectionPoint>().FirstOrDefault(c => c.Type == TrackConnectionPoint.ConnectionType.End);
+            if (endConnectionPoint == null)
+            {
+                return;
+            }
+
             // Rejig hierarchy to make connection points parents
             TransformUtils.InvertParentChildRelationship(gameObject, startConnectionPoint.gameObject);
             TransformUtils.InvertParentChildRelationship(Selection.activeGameObject, endConnectionPoint.gameObject);

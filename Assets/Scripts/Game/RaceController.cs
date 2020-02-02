@@ -1,9 +1,11 @@
 ﻿using UnityEngine;
 using System;
 using System.Linq;
+using UnityEngine.SceneManagement;
 
 public class RaceController : MonoBehaviour
 {
+    public GameObject vehicle;
     public int Players { private get; set; }
     public int Laps { private get; set; }
     public TimeSpan time { get; private set; }
@@ -15,11 +17,8 @@ public class RaceController : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        this.vehicles = FindObjectsOfType<VehicleInfo>().OrderBy(v => v.Position).ToArray();
-        foreach (var vehicle in this.vehicles)
-        {
-            vehicle.OnLapFinished.AddListener(this.CheckForRaceFinished);
-        }
+        this.InstantiateVehicles();
+        GetComponent<CheckpointWatcher>().enabled = true;
         this.time = TimeSpan.FromSeconds(-3);
         this.AssignPlayersToVehicles();
         var player1Vehicle = this.vehicles.SingleOrDefault(v => v.Player == 1);
@@ -89,6 +88,27 @@ public class RaceController : MonoBehaviour
         {
             this.Status = RaceStatus.Finished;
             this.finishedMenu.SetActive(true);
+        }
+    }
+
+    private void InstantiateVehicles()
+    {
+        var checkpointWatcher = GetComponent<CheckpointWatcher>();
+        var firstCheckpoint = checkpointWatcher.Checkpoints.First();
+        for (var i = 0; i < 12; i ++)
+        {
+            var newVehicle = Instantiate(
+                vehicle,
+                firstCheckpoint.transform.position - firstCheckpoint.transform.forward * 7 * i + firstCheckpoint.transform.right * (i % 2 == 0 ? -5 : 5),
+                firstCheckpoint.transform.rotation
+            );
+            SceneManager.MoveGameObjectToScene(newVehicle, this.gameObject.scene);
+        }
+
+        this.vehicles = FindObjectsOfType<VehicleInfo>().OrderBy(v => v.Position).ToArray();
+        foreach (var vehicle in this.vehicles)
+        {
+            vehicle.OnLapFinished.AddListener(this.CheckForRaceFinished);
         }
     }
 }
