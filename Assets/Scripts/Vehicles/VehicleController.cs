@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections;
+using System.Linq;
 using UnityEngine;
 
 public class VehicleController : MonoBehaviour
@@ -9,14 +10,24 @@ public class VehicleController : MonoBehaviour
     public float Steering = 4;
     public float Grip = .05f;
     public float NudgeAwayStrength = 0.1f;
+    public AudioClip CrashSound;
     public Vector3 velocity { get; private set; }
     private float acceleratorValue;
     private float steeringValue;
     private AudioSource audioSource;
+    private AudioSource crashAudioSource;
 
     public void Start()
     {
         this.audioSource = this.GetComponent<AudioSource>();
+        this.crashAudioSource = this.gameObject.AddComponent<AudioSource>();
+        crashAudioSource.name = "Crash Audio Source";
+        crashAudioSource.clip = this.CrashSound;
+        crashAudioSource.spatialBlend = 1;
+        crashAudioSource.minDistance = 10;
+        crashAudioSource.maxDistance = 50;
+        crashAudioSource.spread = 180;
+        crashAudioSource.playOnAwake = false;
     }
 
     public void HandleInput(float acceleratorValue, float steeringValue)
@@ -66,6 +77,7 @@ public class VehicleController : MonoBehaviour
                 var normalToCollision = (this.transform.position - hitPoint).normalized;
                 this.velocity = this.velocity - Vector3.Dot(this.velocity, normalToCollision) * normalToCollision + normalToCollision * this.NudgeAwayStrength;
             }
+            this.PlayCrashSound();
             return;
         }
 
@@ -100,10 +112,17 @@ public class VehicleController : MonoBehaviour
             var updatedVelocity = this.velocity - velocityInNormal - Mathf.Max(velocityInNormal.magnitude, this.NudgeAwayStrength) * velocityInNormal.normalized;
             this.velocity = new Vector3(updatedVelocity.x, 0, updatedVelocity.z);
         }
+
+        this.PlayCrashSound();
     }
 
     private bool ShouldCollideWith(Collider collider)
     {
         return collider is BoxCollider && !collider.isTrigger && !collider.gameObject.transform.IsChildOf(this.transform);
+    }
+
+    private void PlayCrashSound()
+    {
+        this.crashAudioSource.Play();
     }
 }
