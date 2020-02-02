@@ -50,13 +50,13 @@ public class RaceController : MonoBehaviour
             {
                 
                 vehicle.Player = vehicleNumber + 1;
-                vehicle.GetComponentInChildren<MeshRenderer>().material.color = VehicleColors.PlayerColors[vehicleNumber];
             }
             else
             {
                 vehicle.Player = 0;
-                vehicle.GetComponentInChildren<MeshRenderer>().material.color = VehicleColors.AIColor;
             }
+
+            vehicle.GetComponentInChildren<MeshRenderer>().material.color = vehicle.Color;
         }
     }
 

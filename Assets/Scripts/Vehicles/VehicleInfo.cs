@@ -14,6 +14,8 @@ public class VehicleInfo : MonoBehaviour
 
     public int CurrentLap { get; private set; }
 
+    public Color Color => VehicleColors.Colors[this.Player];
+
     public void IncrementLapCount()
     {
         this.CurrentLap++;

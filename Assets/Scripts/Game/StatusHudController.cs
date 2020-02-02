@@ -17,18 +17,25 @@ public class StatusHudController : MonoBehaviour
         this.lapText = LapLabel.GetComponent<Text>();
         this.positionText = PositionLabel.GetComponent<Text>();
         this.vehicle = FindObjectsOfType<VehicleInfo>().Where(v => v.Player == this.PlayerNumber).SingleOrDefault();
+        if (this.vehicle == null)
+        {
+            return;
+        }
+
+        this.lapText.color = this.vehicle.Color;
+        this.positionText.color = this.vehicle.Color;
     }
 
     private void Update()
     {
         if (this.vehicle == null)
         {
-            lapText.text = string.Empty;
-            positionText.text = string.Empty;
+            this.lapText.text = string.Empty;
+            this.positionText.text = string.Empty;
             return;
         }
 
-        lapText.text = $"Lap {this.vehicle.CurrentLap}";
-        positionText.text = Ordinal.GetOrdinal(this.vehicle.Position);
+        this.lapText.text = this.vehicle.Status == VehicleStatus.Finished ? "Finished" : $"Lap {this.vehicle.CurrentLap}";
+        this.positionText.text = Ordinal.GetOrdinal(this.vehicle.Position);
     }
 }
