@@ -9,5 +9,5 @@ public static class VehicleColors
         Color.green
     };
 
-    public static Color AIColor => Color.magenta;
+    public static Color AIColor => new Color32(255, 128, 0, 255); // Orange
 }

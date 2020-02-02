@@ -55,7 +55,7 @@ public class CheckpointWatcher : MonoBehaviour
             nextCheckpoints[vehicleInfo] = ArrayUtils.GetNextWrapped(this.Checkpoints, checkpoint);
             if (nextCheckpoints[vehicleInfo] == this.Checkpoints[1])
             {
-                vehicleInfo.CurrentLap++;
+                vehicleInfo.IncrementLapCount();
             }
         }
     }

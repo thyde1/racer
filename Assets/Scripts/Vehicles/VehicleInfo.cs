@@ -12,19 +12,12 @@ public class VehicleInfo : MonoBehaviour
 
     public VehicleEvent OnLapFinished = new VehicleEvent();
 
-    private int currentLap = 0;
+    public int CurrentLap { get; private set; }
 
-    public int CurrentLap
+    public void IncrementLapCount()
     {
-        get
-        {
-            return this.currentLap;
-        }
-        set
-        {
-            this.currentLap = value;
-            this.OnLapFinished.Invoke(this);
-        }
+        this.CurrentLap++;
+        this.OnLapFinished.Invoke(this);
     }
 
     public bool IsPlayerControlled => this.Player > 0;
