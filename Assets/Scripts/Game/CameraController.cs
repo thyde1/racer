@@ -5,6 +5,7 @@ using System.Collections.Generic;
 public class CameraController : MonoBehaviour
 {
     private Camera myCamera;
+    private AudioListener audioListener;
     private IEnumerable<VehicleInfo> targets;
 
     // Start is called before the first frame update
@@ -12,6 +13,7 @@ public class CameraController : MonoBehaviour
     {
         this.targets = FindObjectsOfType<VehicleInfo>();
         this.myCamera = this.GetComponentInChildren<Camera>();
+        this.audioListener = this.myCamera.GetComponentInChildren<AudioListener>();
     }
 
     public void SetTargets(IEnumerable<VehicleInfo> targets)
@@ -31,6 +33,8 @@ public class CameraController : MonoBehaviour
                 Quaternion.Euler(70, 0, 0)
             );
         }
+
+        this.audioListener.transform.position = centrePosition;
     }
 
     private bool AreAllTargetsVisible()

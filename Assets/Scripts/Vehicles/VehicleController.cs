@@ -12,6 +12,12 @@ public class VehicleController : MonoBehaviour
     public Vector3 velocity { get; private set; }
     private float acceleratorValue;
     private float steeringValue;
+    private AudioSource audioSource;
+
+    public void Start()
+    {
+        this.audioSource = this.GetComponent<AudioSource>();
+    }
 
     public void HandleInput(float acceleratorValue, float steeringValue)
     {
@@ -43,6 +49,9 @@ public class VehicleController : MonoBehaviour
         this.HandleCollisions();
 
         this.transform.Translate(this.velocity, Space.World);
+
+        this.audioSource.volume = this.velocity.magnitude / this.MaxSpeed;
+        this.audioSource.pitch = this.velocity.magnitude / this.MaxSpeed;
     }
 
     private void HandleCollisions()
