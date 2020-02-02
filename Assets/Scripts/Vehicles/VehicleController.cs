@@ -19,15 +19,7 @@ public class VehicleController : MonoBehaviour
 
     public void Start()
     {
-        this.audioSource = this.GetComponent<AudioSource>();
-        this.crashAudioSource = this.gameObject.AddComponent<AudioSource>();
-        crashAudioSource.name = "Crash Audio Source";
-        crashAudioSource.clip = this.CrashSound;
-        crashAudioSource.spatialBlend = 1;
-        crashAudioSource.minDistance = 10;
-        crashAudioSource.maxDistance = 50;
-        crashAudioSource.spread = 180;
-        crashAudioSource.playOnAwake = false;
+        this.SetupAudioSources();
     }
 
     public void HandleInput(float acceleratorValue, float steeringValue)
@@ -61,8 +53,8 @@ public class VehicleController : MonoBehaviour
 
         this.transform.Translate(this.velocity, Space.World);
 
-        this.audioSource.volume = this.velocity.magnitude / this.MaxSpeed;
-        this.audioSource.pitch = this.velocity.magnitude / this.MaxSpeed;
+        this.audioSource.volume = Mathf.Clamp(this.velocity.magnitude / this.MaxSpeed, 0.1f, 1);
+        this.audioSource.pitch = Mathf.Clamp(this.velocity.magnitude / this.MaxSpeed, 0.1f, 1);
     }
 
     private void HandleCollisions()
@@ -124,5 +116,14 @@ public class VehicleController : MonoBehaviour
     private void PlayCrashSound()
     {
         this.crashAudioSource.Play();
+    }
+
+    private void SetupAudioSources()
+    {
+        this.audioSource = this.GetComponent<AudioSource>();
+        this.crashAudioSource = this.gameObject.AddComponent<AudioSource>();
+        crashAudioSource.name = "Crash Audio Source";
+        crashAudioSource.clip = this.CrashSound;
+        AudioSourceConfigurer.ConfigureDefault(crashAudioSource);
     }
 }
