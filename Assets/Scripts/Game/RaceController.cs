@@ -21,14 +21,12 @@ public class RaceController : MonoBehaviour
         GetComponent<CheckpointWatcher>().enabled = true;
         this.time = TimeSpan.FromSeconds(-3);
         this.AssignPlayersToVehicles();
-        var player1Vehicle = this.vehicles.SingleOrDefault(v => v.Player == 1);
         var hudController = FindObjectOfType<HudController>();
         this.finishedMenu = FindObjectOfType<FinishedMenuController>().gameObject;
         this.finishedMenu.SetActive(false);
         var playerVehicles = this.vehicles.Where(v => v.IsPlayerControlled);
         var camera = FindObjectOfType<CameraController>();
         camera.SetTargets(playerVehicles.Any() ? playerVehicles : this.vehicles);
-        hudController.Vehicle = player1Vehicle ?? this.vehicles.First();
         hudController.enabled = true;
     }
 
