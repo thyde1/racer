@@ -15,6 +15,8 @@ public class HudController : MonoBehaviour
     private IEnumerable<VehicleInfo> playerVehicles;
     private Text timeText;
     private Text countdownText;
+    private AudioSource beeper;
+    private int countdownNumber;
 
     // Start is called before the first frame update
     void Start()
@@ -23,6 +25,7 @@ public class HudController : MonoBehaviour
         this.playerVehicles = FindObjectsOfType<VehicleInfo>().Where(v => v.IsPlayerControlled);
         this.timeText = TimeLabel.GetComponent<Text>();
         this.countdownText = CountdownLabel.GetComponent<Text>();
+        this.beeper = this.GetComponentInChildren<AudioSource>();
         foreach (var controller in this.GetComponentsInChildren<StatusHudController>())
         {
             controller.enabled = true;
@@ -32,7 +35,14 @@ public class HudController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        var countdownNumber = Math.Ceiling(raceController.time.Negate().TotalMilliseconds / 1000);
+        var newCountdownNumber = Mathf.CeilToInt(Convert.ToSingle(raceController.time.Negate().TotalMilliseconds / 1000));
+        if (newCountdownNumber != this.countdownNumber && newCountdownNumber >= 0)
+        {
+            this.beeper.pitch = newCountdownNumber == 0 ? 1.5f : 1;
+            this.beeper.Play();
+        }
+
+        this.countdownNumber = newCountdownNumber;
         this.countdownText.text = countdownNumber == 0 ? "GO!" : (countdownNumber > 0 ? countdownNumber.ToString("0") : "");
 
         var time = raceController.time < TimeSpan.Zero ? TimeSpan.Zero : raceController.time;
