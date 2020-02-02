@@ -50,7 +50,7 @@ public class TrackCreatorWindow : EditorWindow
         var innerVertices = DoOverArc(1, angle * Mathf.Deg2Rad, false, (pos, t, segmentLength) => pos);
         var outerVertices = DoOverArc(width + 1, angle * Mathf.Deg2Rad, false, (pos, t, segmentLength) => pos);
         var centralVertices = DoOverArc(1 + width * 0.5f, angle * Mathf.Deg2Rad, false, (pos, t, segmentLength) => pos);
-        GenerateGround(innerVertices, outerVertices, bend.transform);
+        GenerateGround(angle < 0 ? innerVertices : innerVertices.Reverse(), angle < 0 ? outerVertices : outerVertices.Reverse(), bend.transform);
 
         var startConnectionPoint = new GameObject("Start Connection Point");
         startConnectionPoint.AddComponent<TrackConnectionPoint>().Type = TrackConnectionPoint.ConnectionType.Start;
@@ -60,7 +60,7 @@ public class TrackCreatorWindow : EditorWindow
         endConnectionPoint.AddComponent<TrackConnectionPoint>().Type = TrackConnectionPoint.ConnectionType.End;
         endConnectionPoint.transform.SetParent(bend.transform);
         endConnectionPoint.transform.localPosition = centralVertices.Last();
-        endConnectionPoint.transform.localRotation = Quaternion.Euler(0, -angle, 0);
+        endConnectionPoint.transform.localRotation = Quaternion.Euler(0, angle, 0);
 
         return bend;
     }
@@ -114,9 +114,20 @@ public class TrackCreatorWindow : EditorWindow
         var segments = Mathf.Ceil(angleInRadians / desiredSegmentLength);
         var segmentLength = angleInRadians / segments;
         var results = new List<T>();
-        for (var t = doAtCentres ? segmentLength * 0.5f : 0; t < angleInRadians + segmentLength * 0.25f; t += segmentLength)
+        if (angleInRadians < 0)
         {
-            results.Add(action(new Vector3(radius * Mathf.Cos(t), 0, radius * Mathf.Sin(t)), t, segmentLength));
+            angleInRadians = -angleInRadians;
+            for (var t = doAtCentres ? segmentLength * 0.5f : 0; t < angleInRadians + segmentLength * 0.25f; t += segmentLength)
+            {
+                results.Add(action(new Vector3(radius * Mathf.Cos(t), 0, radius * Mathf.Sin(t)), t, segmentLength));
+            }
+        }
+        else
+        {
+            for (var t = Mathf.PI + (doAtCentres ? segmentLength * 0.5f : 0); t < Mathf.PI + angleInRadians + segmentLength * 0.25f; t += segmentLength)
+            {
+                results.Add(action(new Vector3(radius * Mathf.Cos(-t), 0, -radius * Mathf.Sin(t)), -t, segmentLength));
+            }
         }
 
         return results;
