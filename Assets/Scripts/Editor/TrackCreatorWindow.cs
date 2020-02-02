@@ -20,20 +20,15 @@ public class TrackCreatorWindow : EditorWindow
     private void OnGUI()
     {
         this.titleContent = new GUIContent("Track Creator");
-        GUILayout.Label("Wall Thickness");
-        float.TryParse(GUILayout.TextField(this.wallThickness.ToString()), out this.wallThickness);
-        GUILayout.Label("Width");
-        float.TryParse(GUILayout.TextField(this.trackWidth.ToString()), out this.trackWidth);
-        GUILayout.Label("Bend");
-        GUILayout.Label("Angle");
-        float.TryParse(GUILayout.TextField(this.angle.ToString()), out this.angle);
+        this.wallThickness = EditorGUILayout.FloatField("Wall Thickness", this.wallThickness);
+        this.trackWidth = EditorGUILayout.FloatField("Width", this.trackWidth);
+        this.angle = EditorGUILayout.FloatField("Angle", this.angle);
         if (GUILayout.Button("Generate Bend"))
         {
             var bend = CreateBend(this.trackWidth, this.angle);
             this.PositionCreatedGameObject(bend);
         };
 
-        GUILayout.Label("Straight");
         if (GUILayout.Button("Generate Straight"))
         {
             var straight = CreateStraight(this.trackWidth);
