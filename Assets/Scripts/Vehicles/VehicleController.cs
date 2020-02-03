@@ -33,9 +33,9 @@ public class VehicleController : MonoBehaviour
         this.steeringValue = steeringValue;
     }
 
-    public void HandleVehicleCollision(VehicleController other)
+    public void HandleVehicleCollision(Vector3 velocityInNormal)
     {
-        this.velocity += other.velocity;
+        this.velocity += velocityInNormal * 0.5f;
     }
 
     private void FixedUpdate()
@@ -103,8 +103,8 @@ public class VehicleController : MonoBehaviour
         var otherVehicle = collider.GetComponent<VehicleController>();
         if (otherVehicle != null)
         {
-            otherVehicle.HandleVehicleCollision(this);
-            var updatedVelocity = this.velocity - velocityInNormal;
+            otherVehicle.HandleVehicleCollision(velocityInNormal);
+            var updatedVelocity = this.velocity - velocityInNormal * 0.5f;
             this.velocity = new Vector3(updatedVelocity.x, 0, updatedVelocity.z);
         }
         else
