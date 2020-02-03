@@ -19,10 +19,12 @@ public class VehicleController : MonoBehaviour
     private AudioSource audioSource;
     private AudioSource crashAudioSource;
     private AudioSource tyreAudioSource;
+    private BoxCollider collider;
 
     public void Start()
     {
         this.SetupAudioSources();
+        this.collider = this.GetComponent<BoxCollider>();
     }
 
     public void HandleInput(float acceleratorValue, float steeringValue)
@@ -65,7 +67,7 @@ public class VehicleController : MonoBehaviour
 
     private void HandleCollisions()
     {
-        var rotationOverlaps = Physics.OverlapBox(this.transform.position, this.transform.lossyScale / 2, this.transform.rotation)
+        var rotationOverlaps = Physics.OverlapBox(this.transform.position, Vector3.Scale(this.collider.size, this.transform.lossyScale) / 2, this.transform.rotation)
             .Where(this.ShouldCollideWith);
         if (rotationOverlaps.Any())
         {
@@ -79,7 +81,7 @@ public class VehicleController : MonoBehaviour
             return;
         }
 
-        var castHits = Physics.BoxCastAll(this.transform.position, this.transform.lossyScale / 2, this.velocity.normalized, this.transform.rotation, this.velocity.magnitude)
+        var castHits = Physics.BoxCastAll(this.transform.position, Vector3.Scale(this.collider.size, this.transform.lossyScale) / 2, this.velocity.normalized, this.transform.rotation, this.velocity.magnitude)
             .Where(hit => this.ShouldCollideWith(hit.collider));
         if (castHits.Any())
         {
