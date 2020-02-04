@@ -36,6 +36,6 @@ public class StatusHudController : MonoBehaviour
         }
 
         this.lapText.text = this.vehicle.Status == VehicleStatus.Finished ? "Finished" : $"Lap {this.vehicle.CurrentLap}";
-        this.positionText.text = Ordinal.GetOrdinal(this.vehicle.Position);
+        this.positionText.text = NumberUtils.GetOrdinal(this.vehicle.Position);
     }
 }

@@ -19,7 +19,7 @@ public class VehicleController : MonoBehaviour
     private AudioSource audioSource;
     private AudioSource crashAudioSource;
     private AudioSource tyreAudioSource;
-    private BoxCollider collider;
+    private new BoxCollider collider;
 
     public void Start()
     {

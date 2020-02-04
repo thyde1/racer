@@ -49,7 +49,7 @@ public class HudController : MonoBehaviour
         timeText.text = $"{time.ToString(@"mm\:ss\.ff")}";
         if (this.raceController.Status == RaceStatus.Finished && this.playerVehicles.Count() == 1)
         {
-            this.countdownText.text = $"You finished {Ordinal.GetOrdinal(this.playerVehicles.Single().Position)}";
+            this.countdownText.text = $"You finished {NumberUtils.GetOrdinal(this.playerVehicles.Single().Position)}";
         }
     }
 }

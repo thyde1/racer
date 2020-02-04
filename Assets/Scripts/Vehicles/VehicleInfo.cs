@@ -5,8 +5,29 @@ public class VehicleInfo : MonoBehaviour
 {
     public class VehicleEvent : UnityEvent<VehicleInfo> { }
 
-    public int Player = 1;
-    public int Position = 1;
+    public int Player
+    {
+        get
+        {
+            return this.player;
+        }
+        set
+        {
+            if (value == 0)
+            {
+                this.DriverName = "AI";
+            }
+            else
+            {
+                this.DriverName = $"Player {NumberUtils.NumberToWords(value)}";
+            }
+            this.player = value;
+        }
+    }
+
+    private int player = 0;
+
+    public int Position { get; set; } = 1;
 
     public VehicleStatus Status { get; set; } = VehicleStatus.Racing;
 
@@ -15,6 +36,8 @@ public class VehicleInfo : MonoBehaviour
     public int CurrentLap { get; private set; }
 
     public Color Color => VehicleColors.Colors[this.Player];
+
+    public string DriverName { get; private set; }
 
     public void IncrementLapCount()
     {
