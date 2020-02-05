@@ -16,7 +16,7 @@ public class StatusHudController : MonoBehaviour
     {
         this.lapText = LapLabel.GetComponent<Text>();
         this.positionText = PositionLabel.GetComponent<Text>();
-        this.vehicle = FindObjectsOfType<VehicleInfo>().Where(v => v.Player == this.PlayerNumber).SingleOrDefault();
+        this.vehicle = FindObjectsOfType<VehicleInfo>().Where(v => v.Driver.Player == this.PlayerNumber).SingleOrDefault();
         if (this.vehicle == null)
         {
             return;
