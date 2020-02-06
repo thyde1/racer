@@ -13,10 +13,12 @@ public class RaceController : MonoBehaviour
 
     public VehicleInfo[] Vehicles { get; private set; }
     private GameObject finishedMenu;
+    private DriverFactory driverFactory;
 
     // Use this for initialization
     void Start()
     {
+        this.driverFactory = new DriverFactory();
         this.InstantiateVehicles();
         GetComponent<CheckpointWatcher>().enabled = true;
         this.time = TimeSpan.FromSeconds(-3);
@@ -49,11 +51,11 @@ public class RaceController : MonoBehaviour
             if (vehicleNumber < this.Players)
             {
                 
-                vehicle.Driver = new Driver(vehicleNumber + 1);
+                vehicle.Driver = this.driverFactory.Create(vehicleNumber + 1);
             }
             else
             {
-                vehicle.Driver = new Driver(0);
+                vehicle.Driver = this.driverFactory.Create(0);
             }
 
             vehicle.GetComponentInChildren<MeshRenderer>().material.color = vehicle.Color;

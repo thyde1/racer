@@ -1,9 +1,9 @@
 ﻿public class Driver
 {
-    public Driver(int player)
+    public Driver(int player, string name)
     {
         this.Player = player;
-        this.Name = player == 0 ? "AI" : $"Player {NumberUtils.NumberToWords(player)}";
+        this.Name = name;
     }
 
     public string Name { get; }
